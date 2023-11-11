@@ -111,9 +111,4 @@ public class SQLiteWeatherStore implements WeatherStore {
         update(statement, weathers);
         insert(statement, weathers);
     }
-
-    @Override
-    public String get(Location location, Instant ts) {
-        return null;
-    }
 }
