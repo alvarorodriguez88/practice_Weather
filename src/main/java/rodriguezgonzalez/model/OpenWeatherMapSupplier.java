@@ -92,7 +92,6 @@ public class OpenWeatherMapSupplier implements WeatherSupplier{
                 String cloudsString = cloudsJson.get("all").toString();
                 int clouds = Integer.parseInt(cloudsString);
 
-                //TODO ponerle a weather una variable de id y cambiar la date a tipo instant
                 Weather weather = new Weather(ts, pop, windSpeed, temp, humidity, clouds, location);
                 weathers.add(weather);
             }
