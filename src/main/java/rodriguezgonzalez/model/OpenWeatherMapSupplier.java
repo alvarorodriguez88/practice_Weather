@@ -21,29 +21,11 @@ public class OpenWeatherMapSupplier implements WeatherSupplier{
     private String dataBase;
     private String apiKey;
     private String url;
-    private List<Weather> weathers;
 
-    public OpenWeatherMapSupplier(File file) throws IOException {
-        this.weathers = new ArrayList<>();
+    public OpenWeatherMapSupplier() throws IOException {
     }
 
-    public void findKey(File file){
-        try (BufferedReader buffer = new BufferedReader(new FileReader(file.getPath()))){
-            this.apiKey = buffer.readLine();
-        } catch (IOException e){
-            System.out.println("ERROR: " + e);
-        }
-    }
-    public String findDB(File file){
-        try (BufferedReader buffer = new BufferedReader(new FileReader(file.getPath()))){
-            this.dataBase = buffer.readLine();
-            return dataBase;
-        } catch (IOException e){
-            System.out.println("ERROR: " + e);
-        }
-        return null;
-    }
-    public void entireUrl(Location location){
+    public void entireUrl(Location location, String apiKey){
         this.url = "https://api.openweathermap.org/data/2.5/forecast?lat=" + location.getLat() + "&lon=" + location.getLon() + "&appid=" + apiKey;
     }
 
@@ -56,8 +38,8 @@ public class OpenWeatherMapSupplier implements WeatherSupplier{
     }
 
     @Override
-    public ArrayList<Weather> getWeather(Location location) throws IOException {
-        entireUrl(location);
+    public ArrayList<Weather> getWeather(Location location, String apiKey) throws IOException {
+        entireUrl(location, apiKey);
         String url = getUrl();
         Document doc = Jsoup.connect(url).ignoreContentType(true).get();
         String json = doc.body().text();
@@ -65,7 +47,9 @@ public class OpenWeatherMapSupplier implements WeatherSupplier{
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(json).getAsJsonObject();
         JsonArray arrayObject = (JsonArray) jsonObject.get("list");
-        for (int i = 0; i < arrayObject.size(); i++){
+        ArrayList<Weather> weathers = new ArrayList<>();
+
+        for (int i = 0; i < arrayObject.size(); i++) {
 
             JsonObject jsonObject1 = (JsonObject) arrayObject.get(i);
             JsonElement dateElement = jsonObject1.get("dt_txt");
@@ -76,7 +60,7 @@ public class OpenWeatherMapSupplier implements WeatherSupplier{
             LocalDateTime dateTime = LocalDateTime.parse(date, formatter);
             Instant ts = dateTime.atZone(ZoneId.systemDefault()).toInstant();
 
-            if(substring.equals("12")) {
+            if (substring.equals("21")) {
 
                 String popString = jsonObject1.get("pop").toString();
                 double pop = Double.parseDouble(popString);
@@ -96,6 +80,6 @@ public class OpenWeatherMapSupplier implements WeatherSupplier{
                 weathers.add(weather);
             }
         }
-        return (ArrayList<Weather>) weathers;
+        return weathers;
     }
 }

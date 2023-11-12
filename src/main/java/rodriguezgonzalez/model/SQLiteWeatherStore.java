@@ -11,9 +11,9 @@ public class SQLiteWeatherStore implements WeatherStore {
     public SQLiteWeatherStore() {
 
     }
-    public void initTables(Statement statement, ArrayList<Weather> weathers) throws SQLException {
+    public void initTables(Statement statement, ArrayList<Location> locations) throws SQLException {
         //createDB(statement);
-        createTable(statement, weathers);
+        createTable(statement, locations);
     }
 
     private static void delete(Statement statement, String tableName, String register) throws SQLException {
@@ -26,9 +26,9 @@ public class SQLiteWeatherStore implements WeatherStore {
         statement.execute("CREATE DATABASE Tiempo_Canarias;");
     }
 
-    private static void createTable(Statement statement, ArrayList<Weather> weathers) throws SQLException {
-        for (Weather weather : weathers){
-            statement.execute("CREATE TABLE IF NOT EXISTS " + weather.getLocation().getIsla() + " (" +
+    private static void createTable(Statement statement, ArrayList<Location> locations) throws SQLException {
+        for (Location location : locations){
+            statement.execute("CREATE TABLE IF NOT EXISTS " + location.getIsla() + " (" +
                     "ID INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
                     "DATE TEXT,\n" +
                     "TEMP FLOAT NOT NULL,\n" +
@@ -57,7 +57,6 @@ public class SQLiteWeatherStore implements WeatherStore {
                 statement.execute("INSERT INTO " + weather.getLocation().getIsla() + " (DATE, TEMP, POP, HUMIDITY, CLOUDS, WINDSPEED)\n" +
                         "SELECT '" + newDate + "', " + weather.getTemp() + ", " + weather.getPop() + ", " + weather.getHumidity() + ", " + weather.getClouds() + ", " + weather.getWindSpeed() +
                         " WHERE NOT EXISTS (SELECT 1 FROM " + weather.getLocation().getIsla() + " WHERE DATE = '" + newDate + "');");
-                System.out.println("Se agregó un nuevo registro en " + newDate);
             } catch (SQLException e){
                 System.out.println("ERROR: " + e);
             }
@@ -88,7 +87,6 @@ public class SQLiteWeatherStore implements WeatherStore {
                     ", WINDSPEED = " + weather.getWindSpeed() +
                     " WHERE DATE = '" + newDate + "'";
             statement.execute(query);
-            System.out.println("New update in " + newDate);
         }
     }
 
