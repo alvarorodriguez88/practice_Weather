@@ -10,20 +10,20 @@ public class ProgramController {
         timer = new Timer();
     }
 
-    public void start(String apiKey, String dataBase) throws IOException {
+    public void start(String apiKey, String dataBase) {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
                 WeatherController controller = new WeatherController();
                 try {
                     controller.execute(apiKey, dataBase);
-                    System.out.println("Se acaba de hacer jeje...");
+                    System.out.println("Execution done...");
                 } catch (IOException e) {
                     System.out.println("ERROR: " + e);
                 }
             }
         };
-        long interval = 1000 * 60 * 10;
+        long interval = 1000 * 60 * 60 * 6;
         timer.schedule(task, 0, interval);
     }
 

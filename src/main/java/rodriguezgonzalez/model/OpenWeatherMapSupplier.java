@@ -1,36 +1,26 @@
 package rodriguezgonzalez.model;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
 
 public class OpenWeatherMapSupplier implements WeatherSupplier{
-    private String dataBase;
-    private String apiKey;
     private String url;
 
-    public OpenWeatherMapSupplier() throws IOException {
+    public OpenWeatherMapSupplier() {
     }
 
     public void entireUrl(Location location, String apiKey){
         this.url = "https://api.openweathermap.org/data/2.5/forecast?lat=" + location.getLat() + "&lon=" + location.getLon() + "&appid=" + apiKey;
-    }
-
-    public String getApiKey() {
-        return apiKey;
     }
 
     public String getUrl() {

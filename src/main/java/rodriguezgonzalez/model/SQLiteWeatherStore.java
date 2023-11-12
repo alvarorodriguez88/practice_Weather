@@ -16,16 +16,6 @@ public class SQLiteWeatherStore implements WeatherStore {
         createTable(statement, locations);
     }
 
-    private static void delete(Statement statement, String tableName, String register) throws SQLException {
-        String query = "DELETE FROM " + tableName + " WHERE register = ?";
-        PreparedStatement preparedStatement = statement.getConnection().prepareStatement(query);
-        preparedStatement.setString(1, register);
-        preparedStatement.executeUpdate();
-    }
-    private static void createDB(Statement statement) throws SQLException {
-        statement.execute("CREATE DATABASE Tiempo_Canarias;");
-    }
-
     private static void createTable(Statement statement, ArrayList<Location> locations) throws SQLException {
         for (Location location : locations){
             statement.execute("CREATE TABLE IF NOT EXISTS " + location.getIsla() + " (" +
@@ -38,13 +28,6 @@ public class SQLiteWeatherStore implements WeatherStore {
                     "WINDSPEED FLOAT NOT NULL" +
                     ");");
         }
-    }
-
-    private static void dropTable(Statement statement, Weather weather) throws SQLException {
-        statement.execute("DROP TABLE IF EXISTS " + weather.getLocation().getIsla() + ";\n");
-    }
-    private static void dropDataBase(Statement statement, String dbPath) throws SQLException {
-        statement.execute("DROP DATABASE " + dbPath + ";");
     }
 
     public static void insert(Statement statement, ArrayList<Weather> weathers) throws SQLException {
@@ -61,16 +44,6 @@ public class SQLiteWeatherStore implements WeatherStore {
                 System.out.println("ERROR: " + e);
             }
         }
-    }
-    public static boolean verificate(Statement statement, Weather weather){
-        boolean res;
-        try{
-            if (statement.execute("SELECT * FROM " + weather.getLocation().getIsla() + " WHERE DATE = " + weather.getTs())) res = true;
-            else res = false;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return false;
     }
 
     private static void update(Statement statement, ArrayList<Weather> weathers) throws SQLException {
