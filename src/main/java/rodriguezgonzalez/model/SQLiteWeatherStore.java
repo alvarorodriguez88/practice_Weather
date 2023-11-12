@@ -12,7 +12,6 @@ public class SQLiteWeatherStore implements WeatherStore {
 
     }
     public void initTables(Statement statement, ArrayList<Location> locations) throws SQLException {
-        //createDB(statement);
         createTable(statement, locations);
     }
 
@@ -30,7 +29,7 @@ public class SQLiteWeatherStore implements WeatherStore {
         }
     }
 
-    public static void insert(Statement statement, ArrayList<Weather> weathers) throws SQLException {
+    public static void insert(Statement statement, ArrayList<Weather> weathers) {
         for (Weather weather : weathers) {
             Instant instant = weather.getTs();
             LocalDateTime dateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();

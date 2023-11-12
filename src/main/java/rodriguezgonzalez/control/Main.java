@@ -1,7 +1,5 @@
 package rodriguezgonzalez.control;
 
-import rodriguezgonzalez.model.*;
-
 import java.io.IOException;
 
 public class Main {
@@ -13,6 +11,7 @@ public class Main {
         } catch (InterruptedException e) {
             System.out.println("ERROR: " + e);
         }
+        System.out.println("Program finished");
         controller.stop();
     }
 }

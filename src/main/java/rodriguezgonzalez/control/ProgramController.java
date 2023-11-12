@@ -1,4 +1,4 @@
-package rodriguezgonzalez.model;
+package rodriguezgonzalez.control;
 
 import java.io.IOException;
 import java.util.Timer;

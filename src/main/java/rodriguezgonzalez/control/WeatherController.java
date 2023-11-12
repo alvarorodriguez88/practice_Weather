@@ -1,4 +1,9 @@
-package rodriguezgonzalez.model;
+package rodriguezgonzalez.control;
+
+import rodriguezgonzalez.model.Location;
+import rodriguezgonzalez.model.OpenWeatherMapSupplier;
+import rodriguezgonzalez.model.SQLiteWeatherStore;
+import rodriguezgonzalez.model.Weather;
 
 import java.io.IOException;
 import java.sql.Connection;
