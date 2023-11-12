@@ -50,7 +50,7 @@ public class OpenWeatherMapSupplier implements WeatherSupplier{
             LocalDateTime dateTime = LocalDateTime.parse(date, formatter);
             Instant ts = dateTime.atZone(ZoneId.systemDefault()).toInstant();
 
-            if (substring.equals("21")) {
+            if (substring.equals("12")) {
 
                 String popString = jsonObject1.get("pop").toString();
                 double pop = Double.parseDouble(popString);
