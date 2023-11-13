@@ -77,7 +77,7 @@ The database consists of 7 columns, including the required meteorological data, 
 
 
 ###### User Interface
-Upon running the program, the user will be able to see various informative messages in the console each time the routine is executed and each time each table is updated with its respective name. Additionally, a message will appear when the program automatically finishes after 48 hours since it started (unless stopped earlier).
+Upon running the program, the user will be able to see various informative messages in the console each time the routine is executed and each time each table is updated with its respective name.
 
 ------------
 
