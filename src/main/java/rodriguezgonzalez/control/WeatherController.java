@@ -16,7 +16,7 @@ public class WeatherController {
 
     }
     public void execute(String apiKey, String dataBase) throws IOException {
-        ArrayList<Location> locations = new ArrayList<Location>() {{
+        ArrayList<Location> locations = new ArrayList<>() {{
             add(new Location(27.976897166863406, -15.581220101642044, "Gran_Canaria"));
             add(new Location(28.573841603162755, -13.976919911584199, "Fuerteventura"));
             add(new Location(29.006908264835392, -13.614044825597858, "Lanzarote"));
