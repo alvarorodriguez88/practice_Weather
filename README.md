@@ -70,8 +70,7 @@ The program was tasked with obtaining information through the OpenWeather websit
 ###### Database Design
 The database consists of 7 columns, including the required meteorological data, preceded by a column that identifies each record in the database (ID).
 
-| ID | DATE | TEMP | POP | HUMIDITY | CLOUDS | WINDSPEED |
-
+![Uploading Captura de pantalla 2023-11-12 192529.png…]()
 
 ###### Class Diagram
 Hacerlo en el IPad
