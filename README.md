@@ -14,7 +14,7 @@ This program is designed to acquire specific meteorological data from the OpenWe
 	- Database Design
 	- User Interface
 - Implementation
-  - Source Code Structure
+  	- Source Code Structure
 	- Key Features
 	- Issues and Solutions
 - Testing
