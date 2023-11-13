@@ -73,7 +73,8 @@ The database consists of 7 columns, including the required meteorological data, 
 ![Captura de pantalla 2023-11-12 192529](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/2444a2a5-8c97-47a4-887a-57e32ebbe194)
 
 ###### Class Diagram
-Hacerlo en el IPad
+![Captura de pantalla 2023-11-13 135757](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/7a1483a9-0fbf-422f-899b-72fe715497ea)
+
 
 ###### User Interface
 Upon running the program, the user will be able to see various informative messages in the console each time the routine is executed and each time each table is updated with its respective name. Additionally, a message will appear when the program automatically finishes after 48 hours since it started (unless stopped earlier).
