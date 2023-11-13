@@ -38,7 +38,9 @@ Additionally, the code has been developed in the "IntelliJ" development environm
 
 ### Used Technologies
 
-The programming language I used for my project was Java, which provides greater flexibility for the required task by allowing more comfortable handling of different classes and external information. The libraries I used in my project were obtained from "Maven Repository" (https://mvnrepository.com/repos/central),  and they are as follows:
+The programming language I used for my project was Java, which provides greater flexibility for the required task by allowing more comfortable handling of different classes and external information. 
+Moreover, the tool I have used for version control is Git, and I have created a repository on GitHub. This has been helpful for me to refer back whenever needed to identify where I went wrong or when the issue started.
+On the other hand, the libraries I used in my project were obtained from "Maven Repository" (https://mvnrepository.com/repos/central),  and they are as follows:
 
 - Jsoup
 		<dependency>
