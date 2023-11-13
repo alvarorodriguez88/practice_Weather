@@ -70,7 +70,7 @@ The program was tasked with obtaining information through the OpenWeather websit
 ###### Database Design
 The database consists of 7 columns, including the required meteorological data, preceded by a column that identifies each record in the database (ID).
 
-![Uploading Captura de pantalla 2023-11-12 192529.png…]()
+![Captura de pantalla 2023-11-12 192529](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/2444a2a5-8c97-47a4-887a-57e32ebbe194)
 
 ###### Class Diagram
 Hacerlo en el IPad
