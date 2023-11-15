@@ -38,7 +38,9 @@ Additionally, the code has been developed in the "IntelliJ" development environm
 
 ### Used Technologies
 
-The programming language I used for my project was Java, which provides greater flexibility for the required task by allowing more comfortable handling of different classes and external information. The libraries I used in my project were obtained from "Maven Repository" (https://mvnrepository.com/repos/central),  and they are as follows:
+The programming language I used for my project was Java, which provides greater flexibility for the required task by allowing more comfortable handling of different classes and external information. 
+Moreover, the tool I have used for version control is Git, and I have created a repository on GitHub. This has been helpful for me to refer back whenever needed to identify where I went wrong or when the issue started.
+On the other hand, the libraries I used in my project were obtained from "Maven Repository" (https://mvnrepository.com/repos/central),  and they are as follows:
 
 - Jsoup
 		<dependency>
@@ -164,7 +166,7 @@ At first, I encountered several errors, which I addressed by examining the conso
 
 6. In the window that appears, give it a name (recommendation: "Main"). Then, in the "Main class" box, click the icon next to it and choose the option that says "Main of rodriguezgonzalez.control."
 
-7. Next, in the box below ("Program arguments"), insert two parameters. The first should be your personal API Key, and the second should be the path where you want to save the database, ending with the name "/Tiempo_Canarias.db" to create the connection correctly (keep this information handy, as it will be useful later).
+7. Next, in the box below ("Program arguments"), insert two parameters. The first should be your personal API Key(args[0]), and the second (args[1]) should be the path where you want to save the database, ending with the name "/Tiempo_Canarias.db" to create the connection correctly (keep this information handy, as it will be useful later).
 
 8. Click "Apply" and then "Ok," and proceed to run the program.
 
