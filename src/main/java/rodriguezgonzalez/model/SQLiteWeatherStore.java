@@ -68,7 +68,7 @@ public class SQLiteWeatherStore implements WeatherStore {
         try {
             String url = "jdbc:sqlite:" + dbPath;
             conn = DriverManager.getConnection(url);
-            System.out.println("Conexion");
+            System.out.println("Connected");
             return conn;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
