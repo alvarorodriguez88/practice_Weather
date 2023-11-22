@@ -1,4 +1,4 @@
-package rodriguezgonzalez.model;
+package rodriguezgonzalez.control;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -6,6 +6,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import rodriguezgonzalez.model.Location;
+import rodriguezgonzalez.model.Weather;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -13,7 +16,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-public class OpenWeatherMapSupplier implements WeatherSupplier{
+public class OpenWeatherMapSupplier implements WeatherSupplier {
     private String url;
 
     public OpenWeatherMapSupplier() {

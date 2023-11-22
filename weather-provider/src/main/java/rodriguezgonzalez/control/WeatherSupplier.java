@@ -1,4 +1,7 @@
-package rodriguezgonzalez.model;
+package rodriguezgonzalez.control;
+
+import rodriguezgonzalez.model.Location;
+import rodriguezgonzalez.model.Weather;
 
 import java.io.IOException;
 import java.util.ArrayList;

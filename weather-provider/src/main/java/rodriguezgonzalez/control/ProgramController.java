@@ -1,11 +1,12 @@
 package rodriguezgonzalez.control;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class ProgramController {
-    private Timer timer;
+    private final Timer timer;
     public ProgramController() {
         timer = new Timer();
     }
@@ -14,11 +15,16 @@ public class ProgramController {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                WeatherController controller = new WeatherController();
+                WeatherController controller = null;
                 try {
-                    controller.execute(apiKey, dataBase);
+                    controller = new WeatherController(new SQLiteWeatherStore(dataBase));
+                } catch (SQLException e) {
+                    System.out.println("ERROR: " + e);
+                }
+                try {
+                    controller.execute(apiKey);
                     System.out.println("Execution done...");
-                } catch (IOException e) {
+                } catch (SQLException | IOException e) {
                     System.out.println("ERROR: " + e);
                 }
             }

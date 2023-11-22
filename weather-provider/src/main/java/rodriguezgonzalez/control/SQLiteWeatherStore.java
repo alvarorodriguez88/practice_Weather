@@ -1,4 +1,7 @@
-package rodriguezgonzalez.model;
+package rodriguezgonzalez.control;
+
+import rodriguezgonzalez.model.Location;
+import rodriguezgonzalez.model.Weather;
 
 import java.sql.*;
 import java.time.Instant;
@@ -8,14 +11,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class SQLiteWeatherStore implements WeatherStore {
-    public SQLiteWeatherStore() {
-
+    private final String dbPath;
+    private Connection conn;
+    private Statement statement;
+    public SQLiteWeatherStore(String dbPath) throws SQLException {
+        this.dbPath = dbPath;
+        this.conn = connect(dbPath);
+        this.statement = conn.createStatement();
     }
-    public void initTables(Statement statement, ArrayList<Location> locations) throws SQLException {
-        createTable(statement, locations);
+    public void initTables(ArrayList<Location> locations) throws SQLException {
+        createTable(locations);
     }
 
-    private static void createTable(Statement statement, ArrayList<Location> locations) throws SQLException {
+    private void createTable(ArrayList<Location> locations) throws SQLException {
         for (Location location : locations){
             statement.execute("CREATE TABLE IF NOT EXISTS " + location.getIsla() + " (" +
                     "ID INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
@@ -29,7 +37,7 @@ public class SQLiteWeatherStore implements WeatherStore {
         }
     }
 
-    public static void insert(Statement statement, ArrayList<Weather> weathers) {
+    public void insert(ArrayList<Weather> weathers) {
         for (Weather weather : weathers) {
             Instant instant = weather.getTs();
             LocalDateTime dateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -45,7 +53,7 @@ public class SQLiteWeatherStore implements WeatherStore {
         }
     }
 
-    private static void update(Statement statement, ArrayList<Weather> weathers) throws SQLException {
+    private void update(ArrayList<Weather> weathers) throws SQLException {
         for (Weather weather : weathers) {
             Instant instant = weather.getTs();
             LocalDateTime dateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -77,8 +85,8 @@ public class SQLiteWeatherStore implements WeatherStore {
     }
 
     @Override
-    public void save(Statement statement, ArrayList<Weather> weathers) throws SQLException {
-        update(statement, weathers);
-        insert(statement, weathers);
+    public void save(ArrayList<Weather> weathers) throws SQLException {
+        update(weathers);
+        insert(weathers);
     }
 }
