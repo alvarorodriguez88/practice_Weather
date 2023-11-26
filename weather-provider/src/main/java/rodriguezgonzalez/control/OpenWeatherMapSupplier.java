@@ -51,7 +51,8 @@ public class OpenWeatherMapSupplier implements WeatherSupplier {
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime dateTime = LocalDateTime.parse(date, formatter);
-            Instant ts = dateTime.atZone(ZoneId.systemDefault()).toInstant();
+            Instant predictionTime = dateTime.atZone(ZoneId.systemDefault()).toInstant();
+            Instant ts = Instant.now();
 
             if (substring.equals("12")) {
 
@@ -69,7 +70,7 @@ public class OpenWeatherMapSupplier implements WeatherSupplier {
                 String cloudsString = cloudsJson.get("all").toString();
                 int clouds = Integer.parseInt(cloudsString);
 
-                Weather weather = new Weather(ts, pop, windSpeed, temp, humidity, clouds, location);
+                Weather weather = new Weather(ts, predictionTime, pop, windSpeed, temp, humidity, clouds, location);
                 weathers.add(weather);
             }
         }
