@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 public class JMSWeatherStore implements WeatherStore {
     private String brokerUrl = "tcp://localhost:61616";
+    private String subject = "prediction.Weather";
     public JMSWeatherStore() {
 
     }
@@ -29,8 +30,9 @@ public class JMSWeatherStore implements WeatherStore {
         ConnectionFactory connFactory = new ActiveMQConnectionFactory(brokerUrl);
         Connection connection = connFactory.createConnection();
         connection.start();
+
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        Destination destination = session.createTopic("prediction.Weather");
+        Destination destination = session.createQueue(subject);
         MessageProducer producer = session.createProducer(destination);
         for (Weather weather : weathers){
             String json = weatherToJson(weather);
