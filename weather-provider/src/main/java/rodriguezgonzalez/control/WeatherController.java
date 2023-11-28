@@ -3,16 +3,16 @@ package rodriguezgonzalez.control;
 import rodriguezgonzalez.model.Location;
 import rodriguezgonzalez.model.Weather;
 
+import javax.jms.JMSException;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
 public class WeatherController {
     private ArrayList<Location> locations;
-    private SQLiteWeatherStore sqlite;
-    public WeatherController(SQLiteWeatherStore sqlite) {
+    private JMSWeatherStore jms;
+    private OpenWeatherMapSupplier openWeatherMapSupplier;
+    public WeatherController() {
         this.locations = new ArrayList<>() {{
             add(new Location(27.976897166863406, -15.581220101642044, "Gran_Canaria"));
             add(new Location(28.573841603162755, -13.976919911584199, "Fuerteventura"));
@@ -23,15 +23,13 @@ public class WeatherController {
             add(new Location(27.74369055621178, -17.99302465337035, "El_Hierro"));
             add(new Location(28.741658780092063, -17.86465798737256, "La_Palma"));
         }};
-        this.sqlite = sqlite;
+        this.jms = new JMSWeatherStore();
+        this.openWeatherMapSupplier = new OpenWeatherMapSupplier();
     }
-    public void execute(String apiKey) throws SQLException, IOException {
-
-        OpenWeatherMapSupplier openWeatherMapSupplier = new OpenWeatherMapSupplier();
-        sqlite.initTables(locations);
+    public void execute(String apiKey) throws IOException, JMSException {
         for (Location loc : locations) {
             ArrayList<Weather> weathers = openWeatherMapSupplier.getWeather(loc, apiKey);
-            sqlite.save(weathers);
+            jms.save(weathers);
             System.out.println("Uploaded " + loc.getIsla());
         }
     }

@@ -1,5 +1,6 @@
 package rodriguezgonzalez.control;
 
+import javax.jms.JMSException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Timer;
@@ -16,15 +17,11 @@ public class ProgramController {
             @Override
             public void run() {
                 WeatherController controller = null;
-                try {
-                    controller = new WeatherController(new SQLiteWeatherStore(dataBase));
-                } catch (SQLException e) {
-                    System.out.println("ERROR: " + e);
-                }
+                controller = new WeatherController();
                 try {
                     controller.execute(apiKey);
                     System.out.println("Execution done...");
-                } catch (SQLException | IOException e) {
+                } catch (IOException | JMSException e) {
                     System.out.println("ERROR: " + e);
                 }
             }

@@ -23,7 +23,7 @@ public class OpenWeatherMapSupplier implements WeatherSupplier {
     }
 
     public void entireUrl(Location location, String apiKey){
-        this.url = "https://api.openweathermap.org/data/2.5/forecast?lat=" + location.getLat() + "&lon=" + location.getLon() + "&appid=" + apiKey;
+        this.url = "https://api.openweathermap.org/data/2.5/forecast?lat=" + location.getLat() + "&lon=" + location.getLon() + "&appid=" + apiKey + "&units=metric";
     }
 
     public String getUrl() {
@@ -52,7 +52,6 @@ public class OpenWeatherMapSupplier implements WeatherSupplier {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime dateTime = LocalDateTime.parse(date, formatter);
             Instant predictionTime = dateTime.atZone(ZoneId.systemDefault()).toInstant();
-            Instant ts = Instant.now();
 
             if (substring.equals("12")) {
 
@@ -70,7 +69,7 @@ public class OpenWeatherMapSupplier implements WeatherSupplier {
                 String cloudsString = cloudsJson.get("all").toString();
                 int clouds = Integer.parseInt(cloudsString);
 
-                Weather weather = new Weather(ts, predictionTime, pop, windSpeed, temp, humidity, clouds, location);
+                Weather weather = new Weather(predictionTime, pop, windSpeed, temp, humidity, clouds, location);
                 weathers.add(weather);
             }
         }
