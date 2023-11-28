@@ -32,10 +32,13 @@ public class JMSWeatherStore implements WeatherStore {
         connection.start();
 
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        Destination destination = session.createQueue(subject);
+
+        Destination destination = session.createTopic(subject);
+
         MessageProducer producer = session.createProducer(destination);
         for (Weather weather : weathers){
             String json = weatherToJson(weather);
+            System.out.println(json);
             TextMessage text = session.createTextMessage(json);
             producer.send(text);
         }
