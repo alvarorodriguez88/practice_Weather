@@ -32,6 +32,7 @@ public class WeatherController {
             jms.save(weathers);
             System.out.println("Uploaded " + loc.getIsla());
         }
+        jms.getConnection().close();
     }
 
 }

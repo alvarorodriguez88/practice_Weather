@@ -14,7 +14,6 @@ public class EventStoreBuilder {
 
     private String brokerUrl = "tcp://localhost:61616";
     private String topicName = "prediction.Weather";
-    private String eventStoreDirectory = "eventstore";
 
     public EventStoreBuilder() {
 
@@ -40,20 +39,19 @@ public class EventStoreBuilder {
             }
         });
     }
-    public static void store(String json) throws IOException{
+    public void store(String json) throws IOException{
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
-        String tsString = jsonObject.get("ts").getAsString();
-        Instant ts = Instant.parse(tsString);
-        String ss = jsonObject.get("ss").getAsString();
-        LocalDate date = ts.atZone(ZoneOffset.UTC).toLocalDate();
-
-        String basePath = "eventstore/prediction.Weather/" + ss + "/";
-        String filePath = basePath  + date.toString() + ".events";
-
+        String basePath = makeBasePath(jsonObject);
+        String filePath = makeFilePath(jsonObject, basePath);
+        BufferedWriter writer = createDirectory(basePath, filePath);
+        writer.write(json + "\n");
+        writer.close();
+        System.out.println("Event stored at: " + filePath);
+    }
+    public BufferedWriter createDirectory(String basePath, String filePath) throws IOException {
         File directory = new File(basePath);
         File file = new File(filePath);
-
         if (!directory.exists()){
             directory.mkdirs();
             try {
@@ -62,9 +60,16 @@ public class EventStoreBuilder {
                 System.out.println("ERROR: " + e);
             }
         }
-        BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true));
-        writer.write(json + "\n");
-        writer.close();
-        System.out.println("Event stored at: " + filePath);
+        return new BufferedWriter(new FileWriter(filePath, true));
+    }
+    public String makeBasePath(JsonObject jsonObject){
+        String ss = jsonObject.get("ss").getAsString();
+        return  "eventstore/prediction.Weather/" + ss + "/";
+    }
+    public String makeFilePath(JsonObject jsonObject, String basePath){
+        String tsString = jsonObject.get("ts").getAsString();
+        Instant ts = Instant.parse(tsString);
+        LocalDate date = ts.atZone(ZoneOffset.UTC).toLocalDate();
+        return basePath  + date.toString() + ".events";
     }
 }

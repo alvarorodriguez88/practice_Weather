@@ -8,6 +8,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 public interface WeatherStore {
-    void save(ArrayList<Weather> weathers) throws JMSException;
+    void save(ArrayList<Weather> weathers);
 }
 
