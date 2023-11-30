@@ -27,6 +27,7 @@ public class WeatherController {
         this.openWeatherMapSupplier = new OpenWeatherMapSupplier();
     }
     public void execute(String apiKey) throws IOException, JMSException {
+        jms.connect();
         for (Location loc : locations) {
             ArrayList<Weather> weathers = openWeatherMapSupplier.getWeather(loc, apiKey);
             jms.save(weathers);

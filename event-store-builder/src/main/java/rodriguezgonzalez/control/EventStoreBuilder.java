@@ -14,9 +14,10 @@ public class EventStoreBuilder {
 
     private String brokerUrl = "tcp://localhost:61616";
     private String topicName = "prediction.Weather";
+    private StoreEvents storeEvents;
 
     public EventStoreBuilder() {
-
+        this.storeEvents = new StoreEvents();
     }
 
     public void subscribeAndStoreEvents() throws JMSException {
@@ -32,44 +33,12 @@ public class EventStoreBuilder {
         consumer.setMessageListener(message -> {
             try {
                 String text = ((TextMessage) message).getText();
-                store(text);
+                storeEvents.store(text);
                 System.out.println("Received message: " + text);
             } catch (JMSException | IOException e) {
                 e.printStackTrace();
             }
         });
     }
-    public void store(String json) throws IOException{
-        Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
-        String basePath = makeBasePath(jsonObject);
-        String filePath = makeFilePath(jsonObject, basePath);
-        BufferedWriter writer = createDirectory(basePath, filePath);
-        writer.write(json + "\n");
-        writer.close();
-        System.out.println("Event stored at: " + filePath);
-    }
-    public BufferedWriter createDirectory(String basePath, String filePath) throws IOException {
-        File directory = new File(basePath);
-        File file = new File(filePath);
-        if (!directory.exists()){
-            directory.mkdirs();
-            try {
-                file.createNewFile();
-            } catch (IOException e){
-                System.out.println("ERROR: " + e);
-            }
-        }
-        return new BufferedWriter(new FileWriter(filePath, true));
-    }
-    public String makeBasePath(JsonObject jsonObject){
-        String ss = jsonObject.get("ss").getAsString();
-        return  "eventstore/prediction.Weather/" + ss + "/";
-    }
-    public String makeFilePath(JsonObject jsonObject, String basePath){
-        String tsString = jsonObject.get("ts").getAsString();
-        Instant ts = Instant.parse(tsString);
-        LocalDate date = ts.atZone(ZoneOffset.UTC).toLocalDate();
-        return basePath  + date.toString() + ".events";
-    }
+
 }

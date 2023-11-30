@@ -3,6 +3,7 @@ package rodriguezgonzalez.control;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import rodriguezgonzalez.control.exceptions.StoreException;
 import rodriguezgonzalez.model.Weather;
 
 import java.time.Instant;
@@ -23,6 +24,9 @@ public class JMSWeatherStore implements WeatherStore {
     private MessageProducer producer;
 
     public JMSWeatherStore() {
+
+    }
+    public void connect(){
         try {
             this.connectionFactory = new ActiveMQConnectionFactory(brokerUrl);
             this.connection = connectionFactory.createConnection();
@@ -46,7 +50,7 @@ public class JMSWeatherStore implements WeatherStore {
     }
 
     @Override
-    public void save(ArrayList<Weather> weathers) {
+    public void save(ArrayList<Weather> weathers) throws StoreException {
         try {
             for (Weather weather : weathers) {
                 String json = weatherToJson(weather);
@@ -56,7 +60,7 @@ public class JMSWeatherStore implements WeatherStore {
             }
             System.out.println("Messages already sent...");
         } catch (JMSException e) {
-            System.out.println(e.getMessage());
+            throw new StoreException(e.getMessage());
         }
     }
 
