@@ -35,7 +35,7 @@ public class JMSWeatherStore implements WeatherStore {
 
             producer = session.createProducer(destination);
         } catch (JMSException e) {
-            System.out.println(e.getMessage());
+            System.out.println("ERROR: " + e);
         }
     }
 
@@ -51,7 +51,6 @@ public class JMSWeatherStore implements WeatherStore {
         try {
             for (Weather weather : weathers) {
                 String json = weatherToJson(weather);
-                System.out.println(json);
                 TextMessage text = session.createTextMessage(json);
                 producer.send(text);
             }

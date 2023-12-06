@@ -4,7 +4,6 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import rodriguezgonzalez.control.exceptions.StoreException;
 
 import javax.jms.*;
-import java.io.File;
 
 public class MapSuscriber implements Suscriber {
 

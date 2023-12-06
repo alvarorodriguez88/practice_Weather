@@ -33,7 +33,6 @@ public class WeatherController {
             for (Location loc : locations) {
                 ArrayList<Weather> weathers = openWeatherMapSupplier.getWeather(loc, apiKey);
                 jms.save(weathers);
-                System.out.println("Uploaded " + loc.getIsla());
             }
             jms.getConnection().close();
         } catch (JMSException e) {
