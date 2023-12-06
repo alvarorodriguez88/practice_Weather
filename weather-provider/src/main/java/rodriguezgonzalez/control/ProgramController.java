@@ -1,18 +1,18 @@
 package rodriguezgonzalez.control;
 
-import javax.jms.JMSException;
-import java.io.IOException;
-import java.sql.SQLException;
+import rodriguezgonzalez.control.exceptions.StoreException;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class ProgramController {
     private final Timer timer;
+
     public ProgramController() {
         timer = new Timer();
     }
 
-    public void start(String apiKey, String dataBase) {
+    public void start(String apiKey) {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
@@ -21,7 +21,7 @@ public class ProgramController {
                 try {
                     controller.execute(apiKey);
                     System.out.println("Execution done...");
-                } catch (IOException | JMSException e) {
+                } catch (StoreException e) {
                     System.out.println("ERROR: " + e);
                 }
             }

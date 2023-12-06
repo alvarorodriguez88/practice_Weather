@@ -24,36 +24,4 @@ public class Weather {
         this.clouds = clouds;
         this.location = location;
     }
-
-    public Instant getTs() {
-        return ts;
-    }
-
-    public Instant getPredictionTime() {
-        return predictionTime;
-    }
-
-    public double getPop() {
-        return pop;
-    }
-
-    public double getWindSpeed() {
-        return windSpeed;
-    }
-
-    public double getTemp() {
-        return temp;
-    }
-
-    public int getHumidity() {
-        return humidity;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public int getClouds() {
-        return clouds;
-    }
 }

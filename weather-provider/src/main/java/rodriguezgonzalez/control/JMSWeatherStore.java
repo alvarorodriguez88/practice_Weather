@@ -1,22 +1,18 @@
 package rodriguezgonzalez.control;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import rodriguezgonzalez.control.exceptions.StoreException;
 import rodriguezgonzalez.model.Weather;
 
-import java.time.Instant;
-
-import com.google.gson.*;
-
 import javax.jms.*;
 import java.lang.reflect.Type;
+import java.time.Instant;
 import java.util.ArrayList;
 
 public class JMSWeatherStore implements WeatherStore {
-    private String brokerUrl = "tcp://localhost:61616";
-    private String subject = "prediction.Weather";
+    private final String brokerUrl = "tcp://localhost:61616";
+    private final String subject = "prediction.Weather";
     private ConnectionFactory connectionFactory;
     private Connection connection;
     private Session session;
@@ -26,17 +22,18 @@ public class JMSWeatherStore implements WeatherStore {
     public JMSWeatherStore() {
 
     }
-    public void connect(){
+
+    public void connect() {
         try {
-            this.connectionFactory = new ActiveMQConnectionFactory(brokerUrl);
-            this.connection = connectionFactory.createConnection();
+            connectionFactory = new ActiveMQConnectionFactory(brokerUrl);
+            connection = connectionFactory.createConnection();
             connection.start();
 
-            this.session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-            this.destination = session.createTopic(subject);
+            destination = session.createTopic(subject);
 
-            this.producer = session.createProducer(destination);
+            producer = session.createProducer(destination);
         } catch (JMSException e) {
             System.out.println(e.getMessage());
         }

@@ -1,10 +1,11 @@
 package rodriguezgonzalez.control;
 
-import javax.jms.JMSException;
+import rodriguezgonzalez.control.exceptions.StoreException;
 
 public class Main {
-    public static void main(String[] args) throws JMSException {
-        EventStoreBuilder builder = new EventStoreBuilder();
-        builder.subscribeAndStoreEvents();
+    public static void main(String[] args) throws StoreException {
+        MapSuscriber suscriber = new MapSuscriber();
+        FileEventBuilder eventBuilder = new FileEventBuilder(args[0]);
+        suscriber.start(eventBuilder);
     }
 }

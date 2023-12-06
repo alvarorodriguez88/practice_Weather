@@ -1,17 +1,17 @@
 package rodriguezgonzalez.control;
 
+import rodriguezgonzalez.control.exceptions.StoreException;
 import rodriguezgonzalez.model.Location;
 import rodriguezgonzalez.model.Weather;
 
 import javax.jms.JMSException;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class WeatherController {
-    private ArrayList<Location> locations;
-    private JMSWeatherStore jms;
-    private OpenWeatherMapSupplier openWeatherMapSupplier;
+    private final ArrayList<Location> locations;
+    private final JMSWeatherStore jms;
+    private final OpenWeatherMapSupplier openWeatherMapSupplier;
+
     public WeatherController() {
         this.locations = new ArrayList<>() {{
             add(new Location(27.976897166863406, -15.581220101642044, "Gran_Canaria"));
@@ -26,15 +26,19 @@ public class WeatherController {
         this.jms = new JMSWeatherStore();
         this.openWeatherMapSupplier = new OpenWeatherMapSupplier();
     }
-    public void execute(String apiKey) throws IOException, JMSException {
-        jms.connect();
-        for (Location loc : locations) {
-            ArrayList<Weather> weathers = openWeatherMapSupplier.getWeather(loc, apiKey);
-            jms.save(weathers);
-            System.out.println("Uploaded " + loc.getIsla());
-        }
-        jms.getConnection().close();
-    }
 
+    public void execute(String apiKey) throws StoreException {
+        try {
+            jms.connect();
+            for (Location loc : locations) {
+                ArrayList<Weather> weathers = openWeatherMapSupplier.getWeather(loc, apiKey);
+                jms.save(weathers);
+                System.out.println("Uploaded " + loc.getIsla());
+            }
+            jms.getConnection().close();
+        } catch (JMSException e) {
+            throw new StoreException(e.getMessage());
+        }
+    }
 }
 
