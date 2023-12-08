@@ -1,7 +1,11 @@
 # Weather Data Capture
 
 ### Executive Summary
-This program is designed to acquire specific meteorological data from the OpenWeatherMap (https://openweathermap.org/) website through its REST API. These data will be stored in a database containing 8 tables, aiming to store the respective meteorological data for each of the Canary Islands (Gran Canaria, Fuerteventura, Lanzarote, La Graciosa, Tenerife, La Gomera, El Hierro, and La Palma).
+The program will have the function of storing the weather predictions for the next 5 days on the 8 Canary Islands. It is composed of two modules:
+
+Weather-provider: This module is responsible for gathering the relevant information obtained from the OpenWeatherMap API (https://openweathermap.org/) and formatting it as desired. Additionally, it is subscribed to a broker, to which it will send events every 6 hours.
+
+Event-store-builder: This module will have a durable subscription to the topic prediction.weather, through which it will receive events sent by the previous module and interpret them. Furthermore, after interpreting them, it creates a structure in the provided directory to store the content of the events in a file with the .events extension.
 
 ------------
 
@@ -11,12 +15,11 @@ This program is designed to acquire specific meteorological data from the OpenWe
 - Used Technologies
 - Program Design
 	- Requirements
-	- Database Design
+   	- Class diagram
 	- User Interface
 - Implementation
   	- Source Code Structure
 	- Key Features
-	- Issues and Solutions
 - Testing
 	- Testing Strategy
 	- Test Results
@@ -28,169 +31,221 @@ This program is designed to acquire specific meteorological data from the OpenWe
 ------------
 
 ### Introduction
-For the first practical assignment of the course, we were required to create a program aimed at obtaining meteorological data. My project, "practice_Weather," successfully achieves the aforementioned objective by retrieving the required meteorological data outlined in the assignment prompt. This includes data on date, temperature, precipitation probability, humidity, cloud coverage, and wind speed from specific points located on each of the 8 Canary Islands.
+As the second practical assignment for the subject, we were required to create a program aimed at obtaining information and sending and receiving events to a local broker. My project, 'practice_Weather,' focuses on the aforementioned objective. The first module successfully gathers the required meteorological data specified in the assignment (data on date, temperature, precipitation probability, humidity, cloud cover, and wind speed) from various exact points located on each of the 8 Canary Islands. It processes this data to send it as events to the broker, which handles notifying the subscribers.
 
-The program operates locally, displaying informative messages on the screen to keep the user informed about updates. It refreshes every 6 hours, providing predictions for the next 5 days at the specified points based on their latitude and longitude.
+On the other hand, the second module subscribes to the topic created by the active module to receive these events for subsequent storage in a file.
 
-Additionally, the code has been developed in the "IntelliJ" development environment, using the version number 17.
+The program operates locally, displaying informative messages on the screen to keep the user updated on the updates occurring every 6 hours. It provides forecasts for the next 5 days at specific points identified by their latitude and longitude. Additionally, the code has been developed in the 'IntelliJ' working environment, using version 17.
 
 ------------
 
 ### Used Technologies
 
-The programming language I used for my project was Java, which provides greater flexibility for the required task by allowing more comfortable handling of different classes and external information. 
-Moreover, the tool I have used for version control is Git, and I have created a repository on GitHub. This has been helpful for me to refer back whenever needed to identify where I went wrong or when the issue started.
-On the other hand, the libraries I used in my project were obtained from "Maven Repository" (https://mvnrepository.com/repos/central),  and they are as follows:
+TThe programming language I utilized in my project was Java, which offers greater flexibility for the required task by allowing comfortable working with different classes and handling external information more conveniently.
+Additionally, the tool I employed for version control was Git, and I created a repository on GitHub. This repository served as a resource whenever I needed to investigate errors or identify the origins of any issues.
+Furthermore, the libraries I used in my project were sourced from the 'Maven Repository' (https://mvnrepository.com/repos/central),  and they are as follows:
 
-- Jsoup
-		<dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.16.2</version>
-        </dependency>
-- Gson
-		<dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.10.1</version>
-        </dependency>
-- SQLITE-JDBC
-		<dependency>
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-            <version>3.43.2.2</version>
-        </dependency>
+- Jsoup:
+  
+   		<dependency>
+  			<groupId>org.jsoup</groupId>
+            		<artifactId>jsoup</artifactId>
+            		<version>1.16.2</version>
+        	</dependency>
 
+- Gson:
+  
+		<dependency>
+           		<groupId>com.google.code.gson</groupId>
+            		<artifactId>gson</artifactId>
+            		<version>2.10.1</version>
+        	</dependency>
+
+- Activemq:
+  
+		<dependency>
+            		<groupId>org.apache.activemq</groupId>
+  			<artifactId>activemq-client</artifactId>
+  			<version>5.15.12</version>
+  		</dependency>
+
+- Logback:
+  
+  		<dependency>
+            		<groupId>ch.qos.logback</groupId>
+            		<artifactId>logback-classic</artifactId>
+            		<version>1.2.3</version>
+        	</dependency>
+
+In addition to the plugins required for copying the dependencies for the executable.
+
+	<build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>rodriguezgonzalez.control.Main</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 ------------
 
 ### Program Design
 
 ###### Requirements
-The program was tasked with obtaining information through the OpenWeather website's REST API for storage in its own database. It was required to update the weather forecast every 6 hours, specifically at 12 pm, for the upcoming 5 days.
+We were required to retrieve information from the OpenWeather website's REST API, and the module was to send a series of events every 6 hours for the prediction of the next 5 days at 12 pm to the broker. Subsequently, another module subscribed durably to the same broker would handle the information reception and store it in a file.
 
-###### Database Design
-The database consists of 7 columns, including the required meteorological data, preceded by a column that identifies each record in the database (ID).
+###### Class Diagrams
 
-![Captura de pantalla 2023-11-12 192529](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/2444a2a5-8c97-47a4-887a-57e32ebbe194)
+###### Event-store-builder
 
-###### Class Diagram
-![Captura de pantalla 2023-11-13 135757](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/7a1483a9-0fbf-422f-899b-72fe715497ea)
+
+###### Weather-provider
 
 
 ###### User Interface
-Upon running the program, the user will be able to see various informative messages in the console each time the routine is executed and each time each table is updated with its respective name.
+Upon running the program, the user will be able to view various informative messages on the console that appear each time the routine is executed. Additionally, confirmation of the location where the events have been saved will be displayed.
 
 ------------
 
 ### Implementation
 ###### Source Code Structure
-![Captura de pantalla 2023-11-13 103928](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/81b4d301-21ee-4bea-8a36-db539cfbb36b)
 
+###### Event-store-builder
+
+![Captura de pantalla 2023-12-08 175513](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/758bdbc8-3c9e-4fe7-9c2d-68379f46a948)
+
+###### Weather-provider
+
+![Captura de pantalla 2023-12-08 175551](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/ef0799c2-2d4a-4f29-8b6d-6f2afba5c367)
 
 ------------
 
 ###### Key Features
-- Fetching the parameters of interest from the JSON received by the program from the REST API (OpenWeatherMapSupplier).
-		         String popString = jsonObject1.get("pop").toString();
-                double pop = Double.parseDouble(popString);
-                JsonObject windJson = jsonObject1.getAsJsonObject("wind");
-                String windString = windJson.get("speed").toString();
-                double windSpeed = Double.parseDouble(windString);
-                JsonObject mainJson = jsonObject1.getAsJsonObject("main");
-                String tempString = mainJson.get("temp").toString();
-                double temp = Double.parseDouble(tempString);
-                String humidityString = mainJson.get("humidity").toString();
-                int humidity = Integer.parseInt(humidityString);
-                JsonObject cloudsJson = jsonObject1.getAsJsonObject("clouds");
-                String cloudsString = cloudsJson.get("all").toString();
-                int clouds = Integer.parseInt(cloudsString);
-- Storing the information of the different islands in their respective tables (WeatherController).
-		for (Location loc : locations) {
-                ArrayList<Weather> weathers = openWeatherMapSupplier.getWeather(loc, apiKey);
-                sqlite.save(statement, weathers);
-                System.out.println("Uploaded " + loc.getIsla());
+- Fetching the parameters of interest from the JSON received by the program from the REST API (OpenWeatherMapSupplier):
+  
+	        String popString = jsonObject1.get("pop").toString();
+                    double pop = Double.parseDouble(popString);
+                    JsonObject windJson = jsonObject1.getAsJsonObject("wind");
+                    String windString = windJson.get("speed").toString();
+                    double windSpeed = Double.parseDouble(windString);
+                    JsonObject mainJson = jsonObject1.getAsJsonObject("main");
+                    String tempString = mainJson.get("temp").toString();
+                    double temp = Double.parseDouble(tempString);
+                    String humidityString = mainJson.get("humidity").toString();
+                    int humidity = Integer.parseInt(humidityString);
+                    JsonObject cloudsJson = jsonObject1.getAsJsonObject("clouds");
+                    String cloudsString = cloudsJson.get("all").toString();
+                    int clouds = Integer.parseInt(cloudsString);
+- Creating a connection with the broker and sending events to it (JMSWeatherStore):
+
+		public void save(ArrayList<Weather> weathers) throws StoreException {
+        try {
+            for (Weather weather : weathers) {
+                String json = weatherToJson(weather);
+                TextMessage text = session.createTextMessage(json);
+                producer.send(text);
             }
-- Automating the program execution every 6 hours (ProgramController).
-		public void start(String apiKey, String dataBase) {
+            System.out.println("Messages already sent...");
+        } catch (JMSException e) {
+            throw new StoreException(e.getMessage());
+        }
+  
+- Automating the program execution every 6 hours (ProgramController):
+  
+		public void start(String apiKey) {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                WeatherController controller = new WeatherController();
+                WeatherController controller = null;
+                controller = new WeatherController();
                 try {
-                    controller.execute(apiKey, dataBase);
+                    controller.execute(apiKey);
                     System.out.println("Execution done...");
-                } catch (IOException e) {
+                } catch (StoreException e) {
                     System.out.println("ERROR: " + e);
                 }
             }
         };
         long interval = 1000 * 60 * 60 * 6;
         timer.schedule(task, 0, interval);
-
-###### Problems and Solutions
-During the practice, I encountered several issues that I addressed as I progressed. One of the most recent ones occurred in the "OpenWeatherMapSupplier" class. When creating an "ArrayList<Weather>()," my intention was to create one for each island. However, I found that I was creating one for all islands, and as I added more locations, each iteration appended the data from the previous ones, rendering it rather ineffective. To solve this, I simply had to create a list before starting the loop and return it as the result.
-
-Additionally, another problem I faced was committing changes in Spanish. I had to repeat the process in a new project, so the time difference between commits in the "GitHub" repository reflects this.
+    }
 
 ------------
 
 ### Testing
 
 ###### Testing Strategy
-I conducted tests on the project as I progressed. These tests were performed in the main section, aiming to print the results provided by the functions.
+I conducted the project's tests as I progressed. I performed these tests in the main section, aiming to print the results provided by the functions.
 
-I focused on a gradual approach. Initially, I tested the information received from the JSON object. Subsequently, I created a database with a single table and inserted a single record.
+I focused on progressing gradually, starting with tests to understand how to connect to the broker and thus send only one event. Later on, I began sending all the events at once and managed to create a durable subscriber in the second module.
 
-Later on, I discovered how to insert information into each table and created a method to inject the necessary information to ensure that everything was functioning correctly.
-
-The final aspect I addressed was the creation of a class to automate the program, to which I assigned a quick time frame to observe how new records were added to each table during peak hours.
+The last task I handled was creating a class responsible for automating the program. I set it to a quick interval to observe during peak hours how the data from the islands was added to the file created by the subscriber module.
 
 ###### Test Results
-At first, I encountered several errors, which I addressed by examining the console messages. One of the most challenging ones to identify was a mistake I made with the data type of the variable "POP." I initially thought it was an integer, which led to multiple errors when attempting to insert the location.
+At first, I encountered several errors, which I resolved by checking the messages displayed in the console. One of the most challenging issues to identify was when obtaining information from the broker because I was creating a queue instead of a topic.
 
 ------------
 
 ### Deployment
 
 ###### Instructions for Deploying the Program
-1. Download the program from the GitHub repository (https://github.com/alvarorodriguez88/practice_Weather) as a zip file and extract the contents of the zip file to the folder of your choice.
+1. Enter the "practice_Weather" repository and access the latest release (v1.1).
 
-2. Open IntelliJ and navigate to the folder "practice_Weather-master" within the folder where you extracted the contents of the previous download.
+2. Download the 2 zipped files named "event-store-builder" and "weather-provider".
 
-3. With the file open, go to the "src" folder, then within "rodriguezgonzalez" and "control," open the class "Main."
+3. Save their contents in the desired working directory.
 
-4. In the upper part of the screen, you should see "Current File." Enter it and select "Edit Configurations."
+4. Access the terminal and initialize the local server.
 
-5. Inside, click the "+" symbol in the upper-left corner and choose "Application."
+5. Once the local server is initialized, navigate to the working directory where you have the contents of the 2 zip files.
 
-6. In the window that appears, give it a name (recommendation: "Main"). Then, in the "Main class" box, click the icon next to it and choose the option that says "Main of rodriguezgonzalez.control."
+6. While there, in the terminal, initiate the execution of event-store-builder with a command line like this: (INSERT IMAGE). It's important to end the argument, which will be the user's chosen directory when starting the executable, with a "".
 
-7. Next, in the box below ("Program arguments"), insert two parameters. The first should be your personal API Key(args[0]), and the second (args[1]) should be the path where you want to save the database, in this case should be like this "src/main/Tiempo_Canarias.db" to create the connection correctly (keep this information handy, as it will be useful later).
+7. Next, locate the executable for weather-provider and input a line like this in the terminal: (INSERT IMAGE). It requires the user's unique API key as a parameter.
 
-8. Click "Apply" and then "Ok," and proceed to run the program.
-
-9. Ensure you have a program called "DB Browser for SQLite" installed on your computer to visualize the database.
-
-10. Open the application and select "Open Database" at the top. Navigate to the location you entered earlier to view how the records have been inserted.
+8. Finally, to verify the program's effectiveness, navigate to the directory the user inserted as an argument when starting event-store-builder to check the outcome of each operation.
 
 ------------
 
 ### Future Enhancements
-The program opens the door to several possible improvements. For instance, the incorporation of data analysis from the stored information to conduct a study and create tables and graphs for easier user visualization.
+The program lends itself to several possible improvements, for instance, the inclusion of data analysis from the stored information to conduct a study. This could be presented through tables and charts, enabling users to visualize the data more conveniently.
 
 ------------
 
 ### Conclusions
-As the days progress, the weather predictions for the last day being updated become more accurate, although the differences between them may not be very noticeable.
+The data stored in the files becomes more accurate as the prediction date approaches. Furthermore, the method of working with the broker provides greater scalability to the program and numerous possibilities for enhancements.
 
 ------------
 
 ### References
 These are some of the resources I used for this project:
-- https://www.youtube.com/watch?v=sArp10JAIaM&t=40s
-- https://www.youtube.com/watch?v=TipyOAYGsdc
-- https://www.youtube.com/watch?v=ENCwOv2lCms&t=141s
 - https://stackoverflow.com/
 - https://chat.openai.com/
 - Materials available on the Moodle of the subject.
