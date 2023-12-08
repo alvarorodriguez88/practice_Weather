@@ -10,15 +10,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 public class FileEventBuilder implements EventStoreBuilder {
     private String basePath;
-    private File directory;
-    private Instant ts;
-    private LocalDate date;
-    private String ss;
 
     public FileEventBuilder(String basePath) {
         this.basePath = basePath;
@@ -29,8 +24,7 @@ public class FileEventBuilder implements EventStoreBuilder {
         try {
             Gson gson = new Gson();
             JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
-            formatJson(jsonObject);
-            String filePath = makeFilePath();
+            String filePath = makeFilePath(jsonObject);
             writeDirectory(filePath, json);
             System.out.println("Event stored at: " + filePath);
         } catch (IOException e) {
@@ -39,8 +33,8 @@ public class FileEventBuilder implements EventStoreBuilder {
     }
 
     public void writeDirectory(String filePath, String json) throws IOException {
-        directory = new File(basePath + "eventstore/prediction.Weather/" + ss + "/");
         File file = new File(filePath);
+        File directory = file.getParentFile();
         if (!directory.exists()) {
             directory.mkdirs();
             try {
@@ -54,13 +48,11 @@ public class FileEventBuilder implements EventStoreBuilder {
         writer.close();
     }
 
-    public String makeFilePath() {
-        return directory + "/" + date.toString() + ".events";
-    }
-    public void formatJson(JsonObject jsonObject){
+    public String makeFilePath(JsonObject jsonObject) {
         String tsString = jsonObject.get("ts").getAsString();
-        ts = Instant.parse(tsString);
-        date = ts.atZone(ZoneOffset.UTC).toLocalDate();
-        ss = jsonObject.get("ss").getAsString();
+        Instant ts = Instant.parse(tsString);
+        LocalDate date = ts.atZone(ZoneOffset.UTC).toLocalDate();
+        String ss = jsonObject.get("ss").getAsString();
+        return basePath + "eventstore/prediction.Weather/" + ss + "/" + date.toString() + ".events";
     }
 }
