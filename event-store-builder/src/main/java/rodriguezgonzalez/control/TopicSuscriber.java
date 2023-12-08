@@ -5,7 +5,7 @@ import rodriguezgonzalez.control.exceptions.StoreException;
 
 import javax.jms.*;
 
-public class MapSuscriber implements Suscriber {
+public class TopicSuscriber implements Suscriber {
 
     private String brokerUrl = "tcp://localhost:61616";
     private String topicName = "prediction.Weather";
@@ -13,20 +13,20 @@ public class MapSuscriber implements Suscriber {
     private ConnectionFactory factory;
     private Session session;
 
-    public MapSuscriber() {
+    public TopicSuscriber() {
     }
 
     public void start(FileEventBuilder eventBuilder) throws StoreException {
         try {
             factory = new ActiveMQConnectionFactory(brokerUrl);
             connection = factory.createConnection();
-            connection.setClientID("weather-provider");
+            connection.setClientID("event-store-builder");
             connection.start();
 
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Topic topic = session.createTopic(topicName);
 
-            MessageConsumer consumer = session.createDurableSubscriber(topic, "weather-provider_" + topicName);
+            MessageConsumer consumer = session.createDurableSubscriber(topic, "event-store-builder_" + topicName);
             consumer.setMessageListener(message -> {
                 try {
                     String text = ((TextMessage) message).getText();

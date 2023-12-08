@@ -33,8 +33,8 @@ public class FileEventBuilder implements EventStoreBuilder {
     }
 
     public void writeDirectory(String filePath, String json) throws IOException {
-        File directory = new File(basePath);
         File file = new File(filePath);
+        File directory = file.getParentFile();
         if (!directory.exists()) {
             directory.mkdirs();
             try {
@@ -52,6 +52,7 @@ public class FileEventBuilder implements EventStoreBuilder {
         String tsString = jsonObject.get("ts").getAsString();
         Instant ts = Instant.parse(tsString);
         LocalDate date = ts.atZone(ZoneOffset.UTC).toLocalDate();
-        return basePath + date.toString() + ".events";
+        String ss = jsonObject.get("ss").getAsString();
+        return basePath + "eventstore/prediction.Weather/" + ss + "/" + date.toString() + ".events";
     }
 }
