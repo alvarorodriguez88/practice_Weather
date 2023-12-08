@@ -10,10 +10,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 public class FileEventBuilder implements EventStoreBuilder {
     private String basePath;
+    private File directory;
+    private Instant ts;
+    private LocalDate date;
+    private String ss;
 
     public FileEventBuilder(String basePath) {
         this.basePath = basePath;
@@ -24,7 +29,8 @@ public class FileEventBuilder implements EventStoreBuilder {
         try {
             Gson gson = new Gson();
             JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
-            String filePath = makeFilePath(jsonObject);
+            formatJson(jsonObject);
+            String filePath = makeFilePath();
             writeDirectory(filePath, json);
             System.out.println("Event stored at: " + filePath);
         } catch (IOException e) {
@@ -33,7 +39,7 @@ public class FileEventBuilder implements EventStoreBuilder {
     }
 
     public void writeDirectory(String filePath, String json) throws IOException {
-        File directory = new File(basePath);
+        directory = new File(basePath + "eventstore/prediction.Weather/" + ss + "/");
         File file = new File(filePath);
         if (!directory.exists()) {
             directory.mkdirs();
@@ -48,10 +54,13 @@ public class FileEventBuilder implements EventStoreBuilder {
         writer.close();
     }
 
-    public String makeFilePath(JsonObject jsonObject) {
+    public String makeFilePath() {
+        return directory + "/" + date.toString() + ".events";
+    }
+    public void formatJson(JsonObject jsonObject){
         String tsString = jsonObject.get("ts").getAsString();
-        Instant ts = Instant.parse(tsString);
-        LocalDate date = ts.atZone(ZoneOffset.UTC).toLocalDate();
-        return basePath + date.toString() + ".events";
+        ts = Instant.parse(tsString);
+        date = ts.atZone(ZoneOffset.UTC).toLocalDate();
+        ss = jsonObject.get("ss").getAsString();
     }
 }
