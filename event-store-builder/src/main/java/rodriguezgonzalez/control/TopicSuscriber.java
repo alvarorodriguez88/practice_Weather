@@ -16,6 +16,7 @@ public class TopicSuscriber implements Suscriber {
     public TopicSuscriber() {
     }
 
+    @Override
     public void start(FileEventBuilder eventBuilder) throws StoreException {
         try {
             factory = new ActiveMQConnectionFactory(brokerUrl);
