@@ -124,10 +124,10 @@ We were required to retrieve information from the OpenWeather website's REST API
 ###### Class Diagrams
 
 ###### Event-store-builder
-
+![Captura de pantalla 2023-12-09 111805](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/58be404f-f3a8-466e-801d-b60b37f13984)
 
 ###### Weather-provider
-
+![Captura de pantalla 2023-12-09 111714](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/58a75ee7-6058-4675-8cbd-e101a490e6f6)
 
 ###### User Interface
 Upon running the program, the user will be able to view various informative messages on the console that appear each time the routine is executed. Additionally, confirmation of the location where the events have been saved will be displayed.
@@ -226,11 +226,15 @@ At first, I encountered several errors, which I resolved by checking the message
 
 5. Once the local server is initialized, navigate to the working directory where you have the contents of the 2 zip files.
 
-6. While there, in the terminal, initiate the execution of event-store-builder with a command line like this: (INSERT IMAGE). It's important to end the argument, which will be the user's chosen directory when starting the executable, with a "".
+6. While there, in the terminal, initiate the execution of event-store-builder with a command line like this: ![Captura de pantalla 2023-12-08 171347](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/b0321967-909d-4231-9eca-44255bf31b99)
 
-7. Next, locate the executable for weather-provider and input a line like this in the terminal: (INSERT IMAGE). It requires the user's unique API key as a parameter.
+   It's important to end the argument, which will be the user's chosen directory when starting the executable, *with a backslash*.
 
-8. Finally, to verify the program's effectiveness, navigate to the directory the user inserted as an argument when starting event-store-builder to check the outcome of each operation.
+8. Next, locate the executable for weather-provider and input a line like this in the terminal: ![Captura de pantalla 2023-12-08 171531](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/93b61c05-a910-4f74-847a-51d2ee6190e3)
+
+   It requires the user's unique API key as a parameter.
+
+10. Finally, to verify the program's effectiveness, navigate to the directory the user inserted as an argument when starting event-store-builder to check the outcome of each operation.
 
 ------------
 
