@@ -12,10 +12,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 
-public class FileEventBuilder implements EventStoreBuilder {
+public class FileEventStoreBuilder implements EventStoreBuilder {
     private String basePath;
 
-    public FileEventBuilder(String basePath) {
+    public FileEventStoreBuilder(String basePath) {
         this.basePath = basePath;
     }
 

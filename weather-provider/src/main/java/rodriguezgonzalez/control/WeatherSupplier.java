@@ -7,5 +7,5 @@ import rodriguezgonzalez.model.Weather;
 import java.util.ArrayList;
 
 public interface WeatherSupplier {
-    ArrayList<Weather> getWeather(Location location, String apiKey) throws StoreException;
+    ArrayList<Weather> getWeather(Location location) throws StoreException;
 }

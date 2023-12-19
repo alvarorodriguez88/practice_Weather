@@ -12,7 +12,7 @@ public class WeatherController {
     private final JMSWeatherStore jms;
     private final OpenWeatherMapSupplier openWeatherMapSupplier;
 
-    public WeatherController() {
+    public WeatherController(String apikey) {
         this.locations = new ArrayList<>() {{
             add(new Location(27.976897166863406, -15.581220101642044, "Gran_Canaria"));
             add(new Location(28.573841603162755, -13.976919911584199, "Fuerteventura"));
@@ -24,14 +24,14 @@ public class WeatherController {
             add(new Location(28.741658780092063, -17.86465798737256, "La_Palma"));
         }};
         this.jms = new JMSWeatherStore();
-        this.openWeatherMapSupplier = new OpenWeatherMapSupplier();
+        this.openWeatherMapSupplier = new OpenWeatherMapSupplier(apikey);
     }
 
     public void execute(String apiKey) throws StoreException {
         try {
             jms.connect();
             for (Location loc : locations) {
-                ArrayList<Weather> weathers = openWeatherMapSupplier.getWeather(loc, apiKey);
+                ArrayList<Weather> weathers = openWeatherMapSupplier.getWeather(loc);
                 jms.save(weathers);
             }
             jms.getConnection().close();

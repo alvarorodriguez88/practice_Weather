@@ -16,10 +16,8 @@ public class ProgramController {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                WeatherController controller = null;
-                controller = new WeatherController();
                 try {
-                    controller.execute(apiKey);
+                    new WeatherController(apiKey).execute(apiKey);
                     System.out.println("Execution done...");
                 } catch (StoreException e) {
                     System.out.println("ERROR: " + e);
