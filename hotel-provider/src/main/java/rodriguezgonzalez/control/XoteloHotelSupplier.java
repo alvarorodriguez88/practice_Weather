@@ -14,13 +14,11 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class XoteloHotelSupplier implements HotelSupplier {
     private String url;
     private String checkIn;
     private String checkOut;
-    private HotelController reader;
 
     public XoteloHotelSupplier() {
         LocalDate today = LocalDate.now();
@@ -28,12 +26,14 @@ public class XoteloHotelSupplier implements HotelSupplier {
         LocalDate fiveDaysLater = today.plusDays(5);
         this.checkOut = fiveDaysLater.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
+
     public String entireUrl(HotelInfo hotelInfo) {
         return url = "https://data.xotelo.com/api/rates" +
-                "? hotel_key = " + hotelInfo.getHotelKey() +
-                "& chk_in = " + checkIn +
-                "& chk_out = " + checkOut;
+                "?hotel_key=" + hotelInfo.getHotelKey() +
+                "&chk_in=" + checkIn +
+                "&chk_out=" + checkOut;
     }
+
     @Override
     public ArrayList<Hotel> getHotel(HotelInfo hotelInfo) throws StoreException {
         try {
@@ -47,23 +47,27 @@ public class XoteloHotelSupplier implements HotelSupplier {
                 process(hotelInfo, jsonObject, hotels);
             }
             return hotels;
-        } catch (IOException e){
+        } catch (IOException e) {
             throw new StoreException(e.getMessage());
         }
     }
 
-    private void process(HotelInfo hotelInfo, JsonObject jsonObject, ArrayList<Hotel> hotels) {
-        JsonObject resultObject = jsonObject.getAsJsonObject("result");
-        String currency = resultObject.get("currency").getAsString();
-        String checkIn = resultObject.get("chk_in").getAsString();
-        String checkOut = resultObject.get("chk_out").getAsString();
-        JsonArray ratesArray = resultObject.getAsJsonArray("rates");
-        for (JsonElement element : ratesArray) {
-            JsonObject rateObject = element.getAsJsonObject();
-            String website = rateObject.get("name").getAsString();
-            int rate = rateObject.get("rate").getAsInt();
-            Hotel hotel = new Hotel(website, currency, checkIn, checkOut, rate, hotelInfo);
-            hotels.add(hotel);
+    private void process(HotelInfo hotelInfo, JsonObject jsonObject, ArrayList<Hotel> hotels) throws StoreException {
+        try {
+            JsonObject resultObject = (JsonObject) jsonObject.get("result");
+            String currency = resultObject.get("currency").getAsString();
+            String checkIn = resultObject.get("chk_in").getAsString();
+            String checkOut = resultObject.get("chk_out").getAsString();
+            JsonArray ratesArray = resultObject.getAsJsonArray("rates");
+            for (JsonElement element : ratesArray) {
+                JsonObject rateObject = element.getAsJsonObject();
+                String website = rateObject.get("name").getAsString();
+                int rate = rateObject.get("rate").getAsInt();
+                Hotel hotel = new Hotel(website, currency, checkIn, checkOut, rate, hotelInfo);
+                hotels.add(hotel);
+            }
+        } catch (NullPointerException e) {
+            throw new StoreException(e.getMessage());
         }
     }
 }

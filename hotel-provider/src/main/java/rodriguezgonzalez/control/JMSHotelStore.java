@@ -7,7 +7,6 @@ import rodriguezgonzalez.control.exceptions.StoreException;
 import rodriguezgonzalez.model.Hotel;
 
 import javax.jms.*;
-import java.time.Instant;
 import java.util.ArrayList;
 
 public class JMSHotelStore implements HotelStore{
