@@ -1,6 +1,10 @@
 package rodriguezgonzalez.model;
 
+import java.time.Instant;
+
 public class Hotel {
+    private Instant ts;
+    private String ss;
     private String website;
     private String currency;
     private String checkIn;
@@ -9,7 +13,9 @@ public class Hotel {
     private HotelInfo hotelInfo;
 
     public Hotel(String website, String currency, String checkIn, String checkOut, int rate, HotelInfo hotelInfo) {
+        this.ts = Instant.now();
         this.website = website;
+        this.ss = "information.Hotel";
         this.currency = currency;
         this.checkIn = checkIn;
         this.checkOut = checkOut;

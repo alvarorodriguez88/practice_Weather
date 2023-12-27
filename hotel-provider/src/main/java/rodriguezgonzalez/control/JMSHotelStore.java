@@ -1,12 +1,13 @@
 package rodriguezgonzalez.control;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import rodriguezgonzalez.control.exceptions.StoreException;
 import rodriguezgonzalez.model.Hotel;
 
 import javax.jms.*;
+import java.lang.reflect.Type;
+import java.time.Instant;
 import java.util.ArrayList;
 
 public class JMSHotelStore implements HotelStore{
@@ -36,7 +37,6 @@ public class JMSHotelStore implements HotelStore{
             throw new StoreException(e.getMessage());
         }
     }
-
     public Connection getConnection() {
         return connection;
     }
@@ -52,9 +52,17 @@ public class JMSHotelStore implements HotelStore{
             throw new StoreException(e.getMessage());
         }
     }
-
     private String hotelToJson(Hotel hotel) {
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Instant.class, new InstantAdapter())
+                .create();
         return gson.toJson(hotel);
+    }
+    private static class InstantAdapter implements JsonSerializer<Instant> {
+
+        @Override
+        public JsonElement serialize(Instant src, Type typeOfSrc, JsonSerializationContext context) {
+            return new JsonPrimitive(src.toString());
+        }
     }
 }

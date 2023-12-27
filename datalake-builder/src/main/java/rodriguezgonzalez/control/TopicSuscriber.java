@@ -8,7 +8,7 @@ import javax.jms.*;
 public class TopicSuscriber implements Suscriber {
 
     private String brokerUrl = "tcp://localhost:61616";
-    private String topicName = "prediction.Weather";
+    private String[] topicNames = {"prediction.Weather", "information.Hotel"};
     private Connection connection;
     private ConnectionFactory factory;
     private Session session;
@@ -21,23 +21,25 @@ public class TopicSuscriber implements Suscriber {
         try {
             factory = new ActiveMQConnectionFactory(brokerUrl);
             connection = factory.createConnection();
-            connection.setClientID("event-store-builder");
+            connection.setClientID("datalake-builder");
             connection.start();
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Topic topic = session.createTopic(topicName);
-            createConsumer(eventBuilder, topic);
+            for (String topicName : topicNames) {
+                Topic topic = session.createTopic(topicName);
+                createConsumer(eventBuilder, topic);
+            }
         } catch (JMSException e) {
             throw new StoreException(e.getMessage());
         }
     }
 
     private void createConsumer(EventStoreBuilder storeBuilder, Topic topic) throws JMSException {
-        MessageConsumer consumer = session.createDurableSubscriber(topic, "event-store-builder_" + topicName);
+        MessageConsumer consumer = session.createDurableSubscriber(topic, "datalake-builder_" + topic.getTopicName());
         consumer.setMessageListener(message -> {
             try {
                 String text = ((TextMessage) message).getText();
-                storeBuilder.save(text);
-            } catch (JMSException | StoreException e) {
+                storeBuilder.save(text, topic.getTopicName());
+            } catch (JMSException e) {
                 System.err.println(e.getMessage());
             }
         });
