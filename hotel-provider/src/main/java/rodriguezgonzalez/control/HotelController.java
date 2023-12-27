@@ -18,7 +18,6 @@ public class HotelController {
     private JMSHotelStore jmsHotelStore;
 
     public HotelController(){
-        // TODO mirar como poner el nombre de cada isla para ponerlo en el directorio, en el PATH
         this.path = "./hotels.txt";
         this.xoteloHotelSupplier = new XoteloHotelSupplier();
         this.jmsHotelStore = new JMSHotelStore();
