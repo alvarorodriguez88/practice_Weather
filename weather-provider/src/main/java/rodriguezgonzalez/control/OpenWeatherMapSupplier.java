@@ -40,14 +40,12 @@ public class OpenWeatherMapSupplier implements WeatherSupplier {
             String url = getUrl();
             Document doc = Jsoup.connect(url).ignoreContentType(true).get();
             String json = doc.body().text();
-
             JsonParser parser = new JsonParser();
             JsonObject jsonObject = parser.parse(json).getAsJsonObject();
             JsonArray arrayObject = (JsonArray) jsonObject.get("list");
             ArrayList<Weather> weathers = new ArrayList<>();
 
             for (int i = 0; i < arrayObject.size(); i++) {
-
                 process(location, arrayObject, i, weathers);
             }
             return weathers;
