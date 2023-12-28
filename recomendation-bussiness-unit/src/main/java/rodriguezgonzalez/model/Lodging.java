@@ -1,24 +1,22 @@
 package rodriguezgonzalez.model;
 
-public class Recommendation {
+public class Lodging {
     private String acronym;
     private String checkIn;
     private String checkOut;
     private String hotelName;
     private String website;
-    private int pricePerNight;
-    private double temp;
-    private double pop;
+    private int price;
+    private String currency;
 
-    public Recommendation(String acronym, String checkIn, String checkOut, String hotelName, String website, int pricePerNight, double temp, double pop) {
+    public Lodging(String acronym, String checkIn, String checkOut, String hotelName, String website, int price, String currency) {
         this.acronym = acronym;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
         this.hotelName = hotelName;
         this.website = website;
-        this.pricePerNight = pricePerNight;
-        this.temp = temp;
-        this.pop = pop;
+        this.price = price;
+        this.currency = currency;
     }
 
     public String getAcronym() {
@@ -41,15 +39,12 @@ public class Recommendation {
         return website;
     }
 
-    public int getPricePerNight() {
-        return pricePerNight;
+    public int getPrice() {
+        return price;
     }
 
-    public double getTemp() {
-        return temp;
-    }
-
-    public double getPop() {
-        return pop;
+    public String getCurrency() {
+        return currency;
     }
 }
+

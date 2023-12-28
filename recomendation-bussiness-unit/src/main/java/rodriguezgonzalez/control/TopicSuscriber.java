@@ -4,6 +4,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import rodriguezgonzalez.control.exceptions.StoreException;
 
 import javax.jms.*;
+import java.sql.SQLException;
 
 public class TopicSuscriber implements Suscriber {
 
@@ -12,13 +13,18 @@ public class TopicSuscriber implements Suscriber {
     private Connection connection;
     private ConnectionFactory factory;
     private Session session;
+    private SQLiteRecommendationStore storer;
 
-    public TopicSuscriber() {
-
+    public TopicSuscriber(String dbPath) throws StoreException {
+        try {
+            this.storer = new SQLiteRecommendationStore(dbPath);
+        } catch (SQLException e) {
+            throw new StoreException(e.getMessage());
+        }
     }
 
     @Override
-    public void start(RecommendationBuilder recommendationBuilder) throws StoreException {
+    public void start(RecommendationFilter recommendationBuilder, EventProcessor processor) throws StoreException {
         try {
             factory = new ActiveMQConnectionFactory(brokerUrl);
             connection = factory.createConnection();
@@ -29,18 +35,20 @@ public class TopicSuscriber implements Suscriber {
                 Topic topic = session.createTopic(topicName);
                 createConsumer(recommendationBuilder, topic);
             }
+            storer.saveUbications(processor.getUbications());
+            storer.saveLodgings(processor.getLodgings());
         } catch (JMSException e) {
             throw new StoreException(e.getMessage());
         }
     }
 
-    private void createConsumer(RecommendationBuilder recommendationBuilder, Topic topic) throws JMSException {
+    private void createConsumer(RecommendationFilter recommendationBuilder, Topic topic) throws JMSException {
         MessageConsumer consumer = session.createDurableSubscriber(topic, "recommendation-business-unit_" + topic.getTopicName());
         consumer.setMessageListener(message -> {
             try {
                 String text = ((TextMessage) message).getText();
                 recommendationBuilder.filter(text, topic.getTopicName());
-            } catch (JMSException e) {
+            } catch (JMSException | StoreException e) {
                 System.err.println(e.getMessage());
             }
         });
