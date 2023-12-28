@@ -12,6 +12,7 @@
         <module>weather-provider</module>
         <module>datalake-builder</module>
         <module>hotel-provider</module>
+        <module>recomendation-bussiness-unit</module>
     </modules>
 
 

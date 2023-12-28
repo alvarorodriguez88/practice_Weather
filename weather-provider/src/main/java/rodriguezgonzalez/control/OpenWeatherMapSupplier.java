@@ -79,8 +79,10 @@ public class OpenWeatherMapSupplier implements WeatherSupplier {
             JsonObject cloudsJson = jsonObject1.getAsJsonObject("clouds");
             String cloudsString = cloudsJson.get("all").toString();
             int clouds = Integer.parseInt(cloudsString);
-
-            Weather weather = new Weather(predictionTime, pop, windSpeed, temp, humidity, clouds, location);
+            JsonArray jsonArray = jsonObject1.getAsJsonArray("weather");
+            JsonObject jsonObject = (JsonObject) jsonArray.get(0);
+            String weatherCondition = jsonObject.get("main").getAsString();
+            Weather weather = new Weather(predictionTime, pop, windSpeed, temp, humidity, clouds, location, weatherCondition);
             weathers.add(weather);
         }
     }
