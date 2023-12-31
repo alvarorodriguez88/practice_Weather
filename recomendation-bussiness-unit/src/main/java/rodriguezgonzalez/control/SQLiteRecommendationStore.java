@@ -91,35 +91,6 @@ public class SQLiteRecommendationStore implements RecommendationStore {
 
         return false;
     }
-    public void insertUbications(ArrayList<Ubication> ubications) throws StoreException {
-        try {
-            conn.setAutoCommit(false); // Habilitar modo de transacción
-
-            PreparedStatement preparedStatement = conn.prepareStatement(
-                    "INSERT OR IGNORE INTO Ubicaciones (Nombre) VALUES (?)"
-            );
-
-            for (Ubication ubication : ubications) {
-                if (!checkExistingUbication(ubication)) {
-                    preparedStatement.setString(1, ubication.getAcronym());
-                    preparedStatement.addBatch();
-                    System.out.println(preparedStatement);
-                }
-            }
-
-            preparedStatement.executeBatch(); // Ejecutar las inserciones en lote
-            conn.commit(); // Confirmar la transacción
-            conn.setAutoCommit(true); // Restaurar modo de auto-commit
-
-        } catch (SQLException e) {
-            try {
-                conn.rollback(); // Revertir la transacción en caso de error
-            } catch (SQLException e1) {
-                throw new StoreException(e1.getMessage());
-            }
-            throw new StoreException(e.getMessage());
-        }
-    }
     private boolean checkExistingUbication(Ubication ubication) throws SQLException {
         String query = "SELECT COUNT(*) AS count FROM Ubicaciones WHERE Nombre = ?";
         PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -170,7 +141,6 @@ public class SQLiteRecommendationStore implements RecommendationStore {
     @Override
     public void saveUbications(ArrayList<Ubication> ubications) throws StoreException {
         initTables();
-        insertUbications(ubications);
     }
 
     @Override
