@@ -14,10 +14,12 @@ public class TopicSuscriber implements Suscriber {
     private ConnectionFactory factory;
     private Session session;
     private SQLiteRecommendationStore storer;
+    private DatalakeFileHandler handler;
 
     public TopicSuscriber(String dbPath) throws StoreException {
         try {
             this.storer = new SQLiteRecommendationStore(dbPath);
+            this.handler = new DatalakeFileHandler();
         } catch (SQLException e) {
             throw new StoreException(e.getMessage());
         }
@@ -31,23 +33,43 @@ public class TopicSuscriber implements Suscriber {
             connection.setClientID("recommendation-business-unit");
             connection.start();
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            for (String topicName : topicNames) {
-                Topic topic = session.createTopic(topicName);
-                createConsumer(recommendationBuilder, topic);
-            }
-            storer.saveUbications(processor.getUbications());
-            storer.saveLodgings(processor.getLodgings());
+            Topic topic = session.createTopic(topicNames[0]);
+            Topic topic1 = session.createTopic(topicNames[1]);
+            createWeatherConsumer(recommendationBuilder, topic, processor);
+            createHotelConsumer(recommendationBuilder, topic1, processor);
         } catch (JMSException e) {
             throw new StoreException(e.getMessage());
         }
     }
 
-    private void createConsumer(RecommendationFilter recommendationBuilder, Topic topic) throws JMSException {
+    private void createWeatherConsumer(RecommendationFilter recommendationBuilder, Topic topic, EventProcessor processor) throws JMSException {
         MessageConsumer consumer = session.createDurableSubscriber(topic, "recommendation-business-unit_" + topic.getTopicName());
         consumer.setMessageListener(message -> {
             try {
                 String text = ((TextMessage) message).getText();
-                recommendationBuilder.filter(text, topic.getTopicName());
+                if (text != null) {
+                    recommendationBuilder.filter(text, topic.getTopicName());
+                    storer.saveUbications(processor.getUbications());
+                } else {
+                    handler.findLastWeatherFile();
+                }
+            } catch (JMSException | StoreException e) {
+                System.err.println(e.getMessage());
+            }
+        });
+    }
+
+    private void createHotelConsumer(RecommendationFilter recommendationBuilder, Topic topic, EventProcessor processor) throws JMSException {
+        MessageConsumer consumer = session.createDurableSubscriber(topic, "recommendation-business-unit_" + topic.getTopicName());
+        consumer.setMessageListener(message -> {
+            try {
+                String text = ((TextMessage) message).getText();
+                if (text != null) {
+                    recommendationBuilder.filter(text, topic.getTopicName());
+                    storer.saveLodgings(processor.getLodgings());
+                } else {
+                    handler.findLastHotelFile();
+                }
             } catch (JMSException | StoreException e) {
                 System.err.println(e.getMessage());
             }

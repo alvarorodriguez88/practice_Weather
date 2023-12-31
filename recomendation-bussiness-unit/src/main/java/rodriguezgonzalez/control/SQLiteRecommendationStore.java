@@ -4,10 +4,7 @@ import rodriguezgonzalez.control.exceptions.StoreException;
 import rodriguezgonzalez.model.Lodging;
 import rodriguezgonzalez.model.Ubication;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class SQLiteRecommendationStore implements RecommendationStore {
@@ -21,42 +18,120 @@ public class SQLiteRecommendationStore implements RecommendationStore {
         this.statement = conn.createStatement();
     }
 
-    public void initTables(ArrayList<Ubication> ubications) throws StoreException {
+    public void initTables() throws StoreException {
+        createTable();
+    }
+
+    public void createTable() throws StoreException {
         try {
-            createTable(ubications);
+            statement.execute("CREATE TABLE IF NOT EXISTS Alojamientos (" +
+                    "ID INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "Ubicacion TEXT," +
+                    "Hotel TEXT," +
+                    "WEBSITE TEXT," +
+                    "PRICE FLOAT," +
+                    "CURRENCY TEXT," +
+                    "CHECKIN TEXT," +
+                    "CHECKOUT TEXT" +
+                    ");");
         } catch (SQLException e) {
             throw new StoreException(e.getMessage());
         }
     }
 
-    private void createTable(ArrayList<Ubication> ubications) throws SQLException {
-        for (Ubication ubication : ubications) {
-            statement.execute("CREATE TABLE IF NOT EXISTS " + ubication.getAcronym() + " (" +
-                    "ID INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
-                    "HOTEL TEXT,\n" +
-                    "WEBSITE TEXT,\n" +
-                    "PRICE INTEGER,\n" +
-                    "CURRENCY TEXT,\n" +
-                    "CHECKIN TEXT,\n" +
-                    "CHECKOUT TEXT" +
-                    ");");
+    public void insertLodgings(ArrayList<Lodging> lodgings) throws StoreException {
+        try {
+            conn.setAutoCommit(false);
+
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    "INSERT INTO Alojamientos (Ubicacion, Hotel, WEBSITE, PRICE, CURRENCY, CHECKIN, CHECKOUT) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?)"
+            );
+
+            for (Lodging lodging : lodgings) {
+                // Verificar si el alojamiento ya existe en la base de datos
+                if (!checkExistingLodging(lodging)) {
+                    preparedStatement.setString(1, lodging.getAcronym()); // Ubicacion
+                    preparedStatement.setString(2, lodging.getHotelName());
+                    preparedStatement.setString(3, lodging.getWebsite());
+                    preparedStatement.setDouble(4, lodging.getPrice());
+                    preparedStatement.setString(5, lodging.getCurrency());
+                    preparedStatement.setString(6, lodging.getCheckIn());
+                    preparedStatement.setString(7, lodging.getCheckOut());
+                    preparedStatement.addBatch();
+                    System.out.println(preparedStatement);
+                }
+            }
+
+            preparedStatement.executeBatch();
+            conn.commit();
+            conn.setAutoCommit(true);
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException rollbackException) {
+                throw new StoreException(rollbackException.getMessage());
+            }
+            throw new StoreException(e.getMessage());
         }
     }
 
-    public void insert(ArrayList<Lodging> lodgings) throws StoreException {
-        for (Lodging lodging : lodgings) {
-            try {
-                statement.execute("INSERT INTO " + lodging.getAcronym() + " (HOTEL, WEBSITE, PRICE, CURRENCY, CHECKIN, CHECKOUT)\n" +
-                        "VALUES ('" + lodging.getHotelName() + "', '" +
-                        lodging.getWebsite() + "', " +
-                        lodging.getPrice() + ", '" +
-                        lodging.getCurrency() + "', '" +
-                        lodging.getCheckIn() + "', '" +
-                        lodging.getCheckOut() + "')");
-            } catch (SQLException e) {
-                throw new StoreException(e.getMessage());
-            }
+    private boolean checkExistingLodging(Lodging lodging) throws SQLException {
+        String query = "SELECT COUNT(*) AS count FROM Alojamientos " +
+                "WHERE Hotel = ? AND WEBSITE = ?";
+        PreparedStatement preparedStatement = conn.prepareStatement(query);
+        preparedStatement.setString(1, lodging.getHotelName());
+        preparedStatement.setString(2, lodging.getWebsite());
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        if (resultSet.next()) {
+            int count = resultSet.getInt("count");
+            return count > 0;
         }
+
+        return false;
+    }
+    public void insertUbications(ArrayList<Ubication> ubications) throws StoreException {
+        try {
+            conn.setAutoCommit(false); // Habilitar modo de transacción
+
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    "INSERT OR IGNORE INTO Ubicaciones (Nombre) VALUES (?)"
+            );
+
+            for (Ubication ubication : ubications) {
+                if (!checkExistingUbication(ubication)) {
+                    preparedStatement.setString(1, ubication.getAcronym());
+                    preparedStatement.addBatch();
+                    System.out.println(preparedStatement);
+                }
+            }
+
+            preparedStatement.executeBatch(); // Ejecutar las inserciones en lote
+            conn.commit(); // Confirmar la transacción
+            conn.setAutoCommit(true); // Restaurar modo de auto-commit
+
+        } catch (SQLException e) {
+            try {
+                conn.rollback(); // Revertir la transacción en caso de error
+            } catch (SQLException e1) {
+                throw new StoreException(e1.getMessage());
+            }
+            throw new StoreException(e.getMessage());
+        }
+    }
+    private boolean checkExistingUbication(Ubication ubication) throws SQLException {
+        String query = "SELECT COUNT(*) AS count FROM Ubicaciones WHERE Nombre = ?";
+        PreparedStatement preparedStatement = conn.prepareStatement(query);
+        preparedStatement.setString(1, ubication.getAcronym());
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        if (resultSet.next()) {
+            int count = resultSet.getInt("count");
+            return count > 0;
+        }
+
+        return false;
     }
 
     /*private void update(ArrayList<Weather> weathers) throws SQLException {
@@ -94,12 +169,13 @@ public class SQLiteRecommendationStore implements RecommendationStore {
 
     @Override
     public void saveUbications(ArrayList<Ubication> ubications) throws StoreException {
-        initTables(ubications);
+        initTables();
+        insertUbications(ubications);
     }
 
     @Override
     public void saveLodgings(ArrayList<Lodging> lodgings) throws StoreException {
         //update(lodgings);
-        insert(lodgings);
+        insertLodgings(lodgings);
     }
 }

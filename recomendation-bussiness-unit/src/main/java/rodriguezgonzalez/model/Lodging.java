@@ -6,10 +6,10 @@ public class Lodging {
     private String checkOut;
     private String hotelName;
     private String website;
-    private int price;
+    private double price;
     private String currency;
 
-    public Lodging(String acronym, String checkIn, String checkOut, String hotelName, String website, int price, String currency) {
+    public Lodging(String acronym, String checkIn, String checkOut, String hotelName, String website, double price, String currency) {
         this.acronym = acronym;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
@@ -39,7 +39,7 @@ public class Lodging {
         return website;
     }
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 

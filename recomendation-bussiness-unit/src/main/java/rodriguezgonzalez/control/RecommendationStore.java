@@ -1,6 +1,5 @@
 package rodriguezgonzalez.control;
 
-import com.google.gson.JsonObject;
 import rodriguezgonzalez.control.exceptions.StoreException;
 import rodriguezgonzalez.model.Lodging;
 import rodriguezgonzalez.model.Ubication;

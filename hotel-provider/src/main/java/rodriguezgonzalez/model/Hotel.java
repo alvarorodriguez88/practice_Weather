@@ -15,7 +15,7 @@ public class Hotel {
     public Hotel(String website, String currency, String checkIn, String checkOut, int rate, HotelInfo hotelInfo) {
         this.ts = Instant.now();
         this.website = website;
-        this.ss = "information.Hotel";
+        this.ss = "hotel-provider";
         this.currency = currency;
         this.checkIn = checkIn;
         this.checkOut = checkOut;

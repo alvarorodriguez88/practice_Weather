@@ -18,7 +18,7 @@ public class HotelController {
     private JMSHotelStore jmsHotelStore;
 
     public HotelController(){
-        this.path = "./hotels.txt";
+        this.path = "./chozos.txt";
         this.xoteloHotelSupplier = new XoteloHotelSupplier();
         this.jmsHotelStore = new JMSHotelStore();
         this.hotelsInfo = new ArrayList<>();

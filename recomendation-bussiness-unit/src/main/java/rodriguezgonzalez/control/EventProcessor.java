@@ -18,17 +18,23 @@ public class EventProcessor {
     public EventProcessor(String weatherCondition, String nights) {
         this.weatherCondition = weatherCondition;
         this.nights = Integer.parseInt(nights);
+        this.ubications = new ArrayList<>();
+        this.lodgings = new ArrayList<>();
     }
 
     public void processWeatherEvent(String json) throws StoreException {
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
-        String weatherConditionString = jsonObject.get("weatherCondition").toString();
-        if (weatherConditionString.equals(weatherCondition.replaceAll("\"", ""))) {
-            String acronym = jsonObject.get("place").toString();
-            double temp = Double.parseDouble(jsonObject.get("temp").toString());
-            double pop = Double.parseDouble(jsonObject.get("pop").toString());
-            ubications.add(new Ubication(acronym, temp, pop));
+        String weatherConditionString = jsonObject.get("weatherCondition").getAsString();
+        if (weatherConditionString.replaceAll("\"", "").equals(weatherCondition)) {
+            JsonObject jsonLocation = (JsonObject) jsonObject.get("location");
+            String acronym = jsonLocation.get("place").getAsString();
+            double temp = Double.parseDouble(jsonObject.get("temp").getAsString());
+            double pop = Double.parseDouble(jsonObject.get("pop").getAsString());
+            Ubication ubication = new Ubication(acronym, temp, pop);
+            ubications.add(ubication);
+            System.out.println("Longitud de ubications: " + ubications.size());
+            //ubications.add(new Ubication(acronym, temp, pop));
         }
     }
     public void processHotelEvent(String json) throws StoreException {
@@ -37,12 +43,15 @@ public class EventProcessor {
         String checkIn = jsonObject.get("checkIn").toString();
         String checkOut = jsonObject.get("checkOut").toString();
         String website = jsonObject.get("website").toString();
-        int price = Integer.parseInt(jsonObject.get("rate").toString()) * nights;
+        double price = Double.parseDouble(jsonObject.get("rate").toString()) * nights;
         String currency = jsonObject.get("currency").toString();
         JsonObject hotelInfo = (JsonObject) jsonObject.get("hotelInfo");
-        String acronym = hotelInfo.get("acronym").toString();
+        String acronym = hotelInfo.get("acronym").toString().replaceAll("\"", "");
         String hotelName = hotelInfo.get("name").toString();
-        lodgings.add(new Lodging(acronym, checkIn, checkOut, hotelName, website, price, currency));
+        Lodging lodging = new Lodging(acronym, checkIn, checkOut, hotelName, website, price, currency);
+        lodgings.add(lodging);
+        //lodgings.add(new Lodging(acronym, checkIn, checkOut, hotelName, website, price, currency));
+        System.out.println("Longitud de lodgings: " + lodgings.size());
     }
 
     /*private void extractedUbication(ArrayList<Ubication> ubications) throws StoreException {
