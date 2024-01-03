@@ -5,16 +5,16 @@ import rodriguezgonzalez.model.Lodging;
 import rodriguezgonzalez.model.Ubication;
 
 import java.sql.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class SQLiteRecommendationStore implements RecommendationStore {
-    private final String dbPath;
     private Connection conn;
     private Statement statement;
 
-    public SQLiteRecommendationStore(String dbPath) throws SQLException {
-        this.dbPath = dbPath;
-        this.conn = connect(dbPath);
+    public SQLiteRecommendationStore() throws SQLException {
+        this.conn = connect("./Datamart.db");
         this.statement = conn.createStatement();
     }
 
@@ -41,6 +41,7 @@ public class SQLiteRecommendationStore implements RecommendationStore {
 
     public void insertLodgings(ArrayList<Lodging> lodgings) throws StoreException {
         try {
+            System.out.println("---INSERT---");
             conn.setAutoCommit(false);
 
             PreparedStatement preparedStatement = conn.prepareStatement(
@@ -91,38 +92,41 @@ public class SQLiteRecommendationStore implements RecommendationStore {
 
         return false;
     }
-    private boolean checkExistingUbication(Ubication ubication) throws SQLException {
-        String query = "SELECT COUNT(*) AS count FROM Ubicaciones WHERE Nombre = ?";
-        PreparedStatement preparedStatement = conn.prepareStatement(query);
-        preparedStatement.setString(1, ubication.getAcronym());
-        ResultSet resultSet = preparedStatement.executeQuery();
 
-        if (resultSet.next()) {
-            int count = resultSet.getInt("count");
-            return count > 0;
+    public void updateLodgings(ArrayList<Lodging> lodgings) throws StoreException {
+        try {
+            System.out.println("---UPDATE---");
+            conn.setAutoCommit(false);
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    "UPDATE Alojamientos SET PRICE = ?, CHECKOUT = ? WHERE Ubicacion = ? AND Hotel = ? AND WEBSITE = ?"
+            );
+            for (Lodging lodging : lodgings) {
+                preparedStatement.setDouble(1, lodging.getPrice());
+                System.out.println(lodging.getPrice() + "€");
+                preparedStatement.setString(2, lodging.getCheckOut());
+                System.out.println("CheckOut nuevo: " + lodging.getCheckOut());
+                preparedStatement.setString(3, lodging.getAcronym());
+                System.out.println("Acronym: " + lodging.getAcronym());
+                preparedStatement.setString(4, lodging.getHotelName());
+                System.out.println("Name: " + lodging.getHotelName());
+                preparedStatement.setString(5, lodging.getWebsite());
+                System.out.println("Website: " + lodging.getWebsite());
+                preparedStatement.addBatch();
+                System.out.println("---------------------------------------");
+            }
+            preparedStatement.executeBatch();
+            conn.commit();
+            conn.setAutoCommit(true);
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException rollbackException) {
+                throw new StoreException(rollbackException.getMessage());
+            }
+            throw new StoreException(e.getMessage());
         }
-
-        return false;
     }
 
-    /*private void update(ArrayList<Weather> weathers) throws SQLException {
-        for (Weather weather : weathers) {
-            Instant instant = weather.getTs();
-            LocalDateTime dateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String newDate = dateTime.format(formatter);
-            String query = "UPDATE " + weather.getLocation().getIsla() +
-                    " SET TEMP = '" + weather.getTemp() +
-                    "', POP = " + weather.getPop() +
-                    ", HUMIDITY = " + weather.getHumidity() +
-                    ", CLOUDS = " + weather.getClouds() +
-                    ", WINDSPEED = " + weather.getWindSpeed() +
-                    " WHERE DATE = '" + newDate + "'";
-            statement.execute(query);
-        }
-    }
-
-     */
 
 
     public Connection connect(String dbPath) {
@@ -145,7 +149,7 @@ public class SQLiteRecommendationStore implements RecommendationStore {
 
     @Override
     public void saveLodgings(ArrayList<Lodging> lodgings) throws StoreException {
-        //update(lodgings);
         insertLodgings(lodgings);
+        updateLodgings(lodgings);
     }
 }

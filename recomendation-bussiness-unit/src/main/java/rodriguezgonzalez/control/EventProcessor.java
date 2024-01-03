@@ -6,24 +6,34 @@ import rodriguezgonzalez.control.exceptions.StoreException;
 import rodriguezgonzalez.model.Lodging;
 import rodriguezgonzalez.model.Ubication;
 
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 public class EventProcessor {
     private String weatherCondition;
-    private int nights;
+    private int days;
     private SQLiteRecommendationStore store;
     private ArrayList<Ubication> ubications;
     private ArrayList<Lodging> lodgings;
     private Set<String> filteredAcronyms;
+    private String userCheckIn;
 
-    public EventProcessor(String weatherCondition, String nights) {
-        this.weatherCondition = weatherCondition;
-        this.nights = Integer.parseInt(nights);
-        this.ubications = new ArrayList<>();
-        this.lodgings = new ArrayList<>();
-        this.filteredAcronyms = new HashSet<>();
+    public EventProcessor(String userCheckIn, String days, String weatherCondition) throws StoreException {
+        try {
+            this.weatherCondition = weatherCondition;
+            this.days = Integer.parseInt(days);
+            this.userCheckIn = userCheckIn;
+            this.ubications = new ArrayList<>();
+            this.lodgings = new ArrayList<>();
+            this.filteredAcronyms = new HashSet<>();
+            this.store = new SQLiteRecommendationStore();
+        } catch (SQLException e){
+            throw new StoreException(e.getMessage());
+        }
     }
 
     public void processWeatherEvent(String json) throws StoreException {
@@ -39,8 +49,7 @@ public class EventProcessor {
             Ubication ubication = new Ubication(acronym, temp, pop);
             ubications.add(ubication);
             filteredAcronyms.add(acronym);
-            System.out.println("Longitud de ubications: " + ubications.size());
-            //ubications.add(new Ubication(acronym, temp, pop));
+            store.saveUbications(ubication);
         }
     }
 
@@ -53,25 +62,39 @@ public class EventProcessor {
             String checkIn = jsonObject.get("checkIn").toString();
             String checkOut = jsonObject.get("checkOut").toString();
             String website = jsonObject.get("website").toString();
-            double price = Double.parseDouble(jsonObject.get("rate").toString()) * nights;
+            double price = Double.parseDouble(jsonObject.get("rate").toString());
             String currency = jsonObject.get("currency").toString();
             String hotelName = hotelInfo.get("name").toString();
-            Lodging lodging = new Lodging(acronym, checkIn, checkOut, hotelName, website, price, currency);
-            lodgings.add(lodging);
-            //lodgings.add(new Lodging(acronym, checkIn, checkOut, hotelName, website, price, currency));
-            System.out.println("Longitud de lodgings: " + lodgings.size());
+            updateOrAddLodging(acronym, hotelName, website, price, checkIn, checkOut, currency);
         }
     }
 
-    /*private void extractedUbication(ArrayList<Ubication> ubications) throws StoreException {
-        try {
-            store.saveUbications(ubications);
-        } catch (StoreException e) {
-            throw new StoreException(e.getMessage());
+    private void updateOrAddLodging(String acronym, String hotelName, String website, double price,
+                                    String checkIn, String checkOut, String currency) {
+        boolean lodgingExists = false;
+        LocalDate userCheckIn = LocalDate.parse(this.userCheckIn, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDate userCheckOut = userCheckIn.plusDays(this.days);
+        LocalDate jsonCheckIn = LocalDate.parse(checkIn.replaceAll("\"", ""), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDate jsonCheckOut = LocalDate.parse(checkOut.replaceAll("\"", ""), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        boolean isInUserRange = !jsonCheckIn.isBefore(userCheckIn) && !jsonCheckOut.isAfter(userCheckOut);
+        if (isInUserRange) {
+            for (Lodging existingLodging : lodgings) {
+                if (existingLodging.getAcronym().equals(acronym)
+                        && existingLodging.getHotelName().equals(hotelName)
+                        && existingLodging.getWebsite().equals(website)) {
+                    // Si existe, actualizar el precio sumándole el nuevo precio obtenido del JSON
+                    existingLodging.setPrice(existingLodging.getPrice() + price);
+                    lodgingExists = true;
+                    break;
+                }
+            }
+            if (!lodgingExists) {
+                Lodging lodging = new Lodging(acronym, checkIn, checkOut, hotelName, website, price, currency);
+                lodgings.add(lodging);
+                store.saveLodgings(lodging);
+            }
         }
     }
-
-     */
 
     public ArrayList<Ubication> getUbications() {
         return ubications;

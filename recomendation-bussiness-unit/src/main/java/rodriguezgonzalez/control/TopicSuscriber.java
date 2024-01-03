@@ -16,9 +16,9 @@ public class TopicSuscriber implements Suscriber {
     private SQLiteRecommendationStore storer;
     private DatalakeFileHandler handler;
 
-    public TopicSuscriber(String dbPath) throws StoreException {
+    public TopicSuscriber() throws StoreException {
         try {
-            this.storer = new SQLiteRecommendationStore(dbPath);
+            this.storer = new SQLiteRecommendationStore();
             this.handler = new DatalakeFileHandler();
         } catch (SQLException e) {
             throw new StoreException(e.getMessage());
@@ -49,7 +49,7 @@ public class TopicSuscriber implements Suscriber {
                 String text = ((TextMessage) message).getText();
                 if (text != null) {
                     recommendationBuilder.filter(text, topic.getTopicName());
-                    storer.saveUbications(processor.getUbications());
+                    //storer.saveUbications(processor.getUbications());
                 } else {
                     handler.findLastWeatherFile();
                 }
@@ -66,7 +66,7 @@ public class TopicSuscriber implements Suscriber {
                 String text = ((TextMessage) message).getText();
                 if (text != null) {
                     recommendationBuilder.filter(text, topic.getTopicName());
-                    storer.saveLodgings(processor.getLodgings());
+                    //storer.saveLodgings(processor.getLodgings());
                 } else {
                     handler.findLastHotelFile();
                 }

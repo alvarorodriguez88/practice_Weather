@@ -14,47 +14,48 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
 public class XoteloHotelSupplier implements HotelSupplier {
-    private String url;
-    private String checkIn;
-    private String checkOut;
+    private final int DAYS_TO_FETCH = 5;
 
     public XoteloHotelSupplier() {
-        LocalDate today = LocalDate.now();
-        this.checkIn = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        LocalDate fiveDaysLater = today.plusDays(5);
-        this.checkOut = fiveDaysLater.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-    }
-
-    public String entireUrl(HotelInfo hotelInfo) {
-        return url = "https://data.xotelo.com/api/rates" +
-                "?hotel_key=" + hotelInfo.getHotelKey() +
-                "&chk_in=" + checkIn +
-                "&chk_out=" + checkOut;
     }
 
     @Override
     public ArrayList<Hotel> getHotel(HotelInfo hotelInfo) throws StoreException {
+        ArrayList<Hotel> hotels = new ArrayList<>();
+
         try {
-            String url = entireUrl(hotelInfo);
-            Document doc = Jsoup.connect(url).ignoreContentType(true).get();
-            String json = doc.body().text();
-            JsonParser parser = new JsonParser();
-            JsonObject jsonObject = parser.parse(json).getAsJsonObject();
-            ArrayList<Hotel> hotels = new ArrayList<>();
-            for (int i = 0; i < jsonObject.size(); i++) {
+            LocalDate today = LocalDate.now();
+
+            for (LocalDate checkInDate : getNextNDays(today, DAYS_TO_FETCH)) {
+                LocalDate checkOutDate = checkInDate.plusDays(1);
+
+                String url = buildUrl(hotelInfo, checkInDate, checkOutDate);
+                Document doc = Jsoup.connect(url).ignoreContentType(true).get();
+                String json = doc.body().text();
+                JsonParser parser = new JsonParser();
+                JsonObject jsonObject = parser.parse(json).getAsJsonObject();
                 process(hotelInfo, jsonObject, hotels);
             }
-            return hotels;
         } catch (IOException e) {
             throw new StoreException(e.getMessage());
         }
+
+        return hotels;
+    }
+
+    private String buildUrl(HotelInfo hotelInfo, LocalDate checkInDate, LocalDate checkOutDate) {
+        return "https://data.xotelo.com/api/rates" +
+                "?hotel_key=" + hotelInfo.getHotelKey() +
+                "&chk_in=" + checkInDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) +
+                "&chk_out=" + checkOutDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 
     private void process(HotelInfo hotelInfo, JsonObject jsonObject, ArrayList<Hotel> hotels) throws StoreException {
         try {
-            JsonObject resultObject = (JsonObject) jsonObject.get("result");
+            JsonObject resultObject = jsonObject.get("result").getAsJsonObject();
             String currency = resultObject.get("currency").getAsString();
             String checkIn = resultObject.get("chk_in").getAsString();
             String checkOut = resultObject.get("chk_out").getAsString();
@@ -69,5 +70,13 @@ public class XoteloHotelSupplier implements HotelSupplier {
         } catch (NullPointerException e) {
             throw new StoreException(e.getMessage());
         }
+    }
+
+    private List<LocalDate> getNextNDays(LocalDate startDate, int days) {
+        List<LocalDate> dates = new ArrayList<>();
+        for (int i = 0; i < days; i++) {
+            dates.add(startDate.plusDays(i));
+        }
+        return dates;
     }
 }

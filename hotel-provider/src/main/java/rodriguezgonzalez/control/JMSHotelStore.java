@@ -47,6 +47,7 @@ public class JMSHotelStore implements HotelStore{
                 String json = hotelToJson(hotel);
                 TextMessage text = session.createTextMessage(json);
                 producer.send(text);
+                System.out.println("Message sent...");
             }
         } catch (JMSException e){
             throw new StoreException(e.getMessage());

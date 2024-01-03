@@ -10,6 +10,7 @@ public class BusinessLeaker implements RecommendationFilter {
 
     @Override
     public void filter(String json, String topicName) throws StoreException {
+        System.out.println(topicName);
         if (topicName.equals("prediction.Weather")){
             try {
                 processor.processWeatherEvent(json);
