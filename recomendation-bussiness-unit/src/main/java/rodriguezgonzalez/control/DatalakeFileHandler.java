@@ -27,7 +27,6 @@ public class DatalakeFileHandler {
             Arrays.sort(archivos, Comparator.comparing(File::getName).reversed());
             return archivos[0];
         }
-
         return null;
     }
 

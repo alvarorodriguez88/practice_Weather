@@ -31,6 +31,10 @@ public class Lodging {
         return checkOut;
     }
 
+    public void setCheckOut(String checkOut) {
+        this.checkOut = checkOut;
+    }
+
     public String getHotelName() {
         return hotelName;
     }

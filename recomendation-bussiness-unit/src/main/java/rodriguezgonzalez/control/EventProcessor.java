@@ -6,7 +6,6 @@ import rodriguezgonzalez.control.exceptions.StoreException;
 import rodriguezgonzalez.model.Lodging;
 import rodriguezgonzalez.model.Ubication;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -16,24 +15,18 @@ import java.util.Set;
 public class EventProcessor {
     private String weatherCondition;
     private int days;
-    private SQLiteRecommendationStore store;
     private ArrayList<Ubication> ubications;
     private ArrayList<Lodging> lodgings;
     private Set<String> filteredAcronyms;
     private String userCheckIn;
 
-    public EventProcessor(String userCheckIn, String days, String weatherCondition) throws StoreException {
-        try {
-            this.weatherCondition = weatherCondition;
-            this.days = Integer.parseInt(days);
-            this.userCheckIn = userCheckIn;
-            this.ubications = new ArrayList<>();
-            this.lodgings = new ArrayList<>();
-            this.filteredAcronyms = new HashSet<>();
-            this.store = new SQLiteRecommendationStore();
-        } catch (SQLException e){
-            throw new StoreException(e.getMessage());
-        }
+    public EventProcessor(String userCheckIn, String days, String weatherCondition) {
+        this.weatherCondition = weatherCondition;
+        this.days = Integer.parseInt(days);
+        this.userCheckIn = userCheckIn;
+        this.ubications = new ArrayList<>();
+        this.lodgings = new ArrayList<>();
+        this.filteredAcronyms = new HashSet<>();
     }
 
     public void processWeatherEvent(String json) throws StoreException {
@@ -41,7 +34,6 @@ public class EventProcessor {
         JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
         String weatherConditionString = jsonObject.get("weatherCondition").getAsString();
         if (weatherConditionString.replaceAll("\"", "").equals(weatherCondition)) {
-            System.out.println(weatherConditionString);
             JsonObject jsonLocation = (JsonObject) jsonObject.get("location");
             String acronym = jsonLocation.get("place").getAsString();
             double temp = Double.parseDouble(jsonObject.get("temp").getAsString());
@@ -49,7 +41,6 @@ public class EventProcessor {
             Ubication ubication = new Ubication(acronym, temp, pop);
             ubications.add(ubication);
             filteredAcronyms.add(acronym);
-            store.saveUbications(ubication);
         }
     }
 
@@ -82,8 +73,8 @@ public class EventProcessor {
                 if (existingLodging.getAcronym().equals(acronym)
                         && existingLodging.getHotelName().equals(hotelName)
                         && existingLodging.getWebsite().equals(website)) {
-                    // Si existe, actualizar el precio sumándole el nuevo precio obtenido del JSON
                     existingLodging.setPrice(existingLodging.getPrice() + price);
+                    existingLodging.setCheckOut(checkOut);
                     lodgingExists = true;
                     break;
                 }
@@ -91,7 +82,6 @@ public class EventProcessor {
             if (!lodgingExists) {
                 Lodging lodging = new Lodging(acronym, checkIn, checkOut, hotelName, website, price, currency);
                 lodgings.add(lodging);
-                store.saveLodgings(lodging);
             }
         }
     }

@@ -17,7 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class XoteloHotelSupplier implements HotelSupplier {
-    private final int DAYS_TO_FETCH = 5;
+    //private final int DAYS_TO_FETCH = 5;
+    private final int DAYS_TO_FETCH = 4;
 
     public XoteloHotelSupplier() {
     }
@@ -25,13 +26,37 @@ public class XoteloHotelSupplier implements HotelSupplier {
     @Override
     public ArrayList<Hotel> getHotel(HotelInfo hotelInfo) throws StoreException {
         ArrayList<Hotel> hotels = new ArrayList<>();
+        if (checkDisponibility(hotelInfo)) {
+            takeDayByDay(hotelInfo, hotels);
+        }
+        return hotels;
+    }
 
+    private boolean checkDisponibility(HotelInfo hotelInfo) throws StoreException {
         try {
-            LocalDate today = LocalDate.now();
+            LocalDate checkIn = LocalDate.now().plusDays(1);
+            LocalDate checkOut = checkIn.plusDays(DAYS_TO_FETCH);
+            String url = buildUrl(hotelInfo, checkIn, checkOut);
+            Document doc = Jsoup.connect(url).ignoreContentType(true).get();
+            String json = doc.body().text();
+            JsonParser parser = new JsonParser();
+            JsonObject jsonObject = parser.parse(json).getAsJsonObject();
+            JsonObject resultObject = jsonObject.get("result").getAsJsonObject();
+            JsonArray ratesArray = resultObject.getAsJsonArray("rates");
+            if (!ratesArray.isEmpty()){
+                return true;
+            }
+            return false;
+        } catch (IOException e) {
+            throw new StoreException(e.getMessage());
+        }
+    }
 
+    private void takeDayByDay(HotelInfo hotelInfo, ArrayList<Hotel> hotels) throws StoreException {
+        try {
+            LocalDate today = LocalDate.now().plusDays(1);
             for (LocalDate checkInDate : getNextNDays(today, DAYS_TO_FETCH)) {
                 LocalDate checkOutDate = checkInDate.plusDays(1);
-
                 String url = buildUrl(hotelInfo, checkInDate, checkOutDate);
                 Document doc = Jsoup.connect(url).ignoreContentType(true).get();
                 String json = doc.body().text();
@@ -42,8 +67,6 @@ public class XoteloHotelSupplier implements HotelSupplier {
         } catch (IOException e) {
             throw new StoreException(e.getMessage());
         }
-
-        return hotels;
     }
 
     private String buildUrl(HotelInfo hotelInfo, LocalDate checkInDate, LocalDate checkOutDate) {
@@ -71,7 +94,6 @@ public class XoteloHotelSupplier implements HotelSupplier {
             throw new StoreException(e.getMessage());
         }
     }
-
     private List<LocalDate> getNextNDays(LocalDate startDate, int days) {
         List<LocalDate> dates = new ArrayList<>();
         for (int i = 0; i < days; i++) {

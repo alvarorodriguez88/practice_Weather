@@ -5,8 +5,6 @@ import rodriguezgonzalez.model.Lodging;
 import rodriguezgonzalez.model.Ubication;
 
 import java.sql.*;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class SQLiteRecommendationStore implements RecommendationStore {
@@ -41,7 +39,6 @@ public class SQLiteRecommendationStore implements RecommendationStore {
 
     public void insertLodgings(ArrayList<Lodging> lodgings) throws StoreException {
         try {
-            System.out.println("---INSERT---");
             conn.setAutoCommit(false);
 
             PreparedStatement preparedStatement = conn.prepareStatement(
@@ -95,7 +92,6 @@ public class SQLiteRecommendationStore implements RecommendationStore {
 
     public void updateLodgings(ArrayList<Lodging> lodgings) throws StoreException {
         try {
-            System.out.println("---UPDATE---");
             conn.setAutoCommit(false);
             PreparedStatement preparedStatement = conn.prepareStatement(
                     "UPDATE Alojamientos SET PRICE = ?, CHECKOUT = ? WHERE Ubicacion = ? AND Hotel = ? AND WEBSITE = ?"
@@ -152,4 +148,5 @@ public class SQLiteRecommendationStore implements RecommendationStore {
         insertLodgings(lodgings);
         updateLodgings(lodgings);
     }
+
 }

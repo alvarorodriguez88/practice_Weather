@@ -2,6 +2,8 @@ package rodriguezgonzalez.control;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import rodriguezgonzalez.control.exceptions.StoreException;
+import rodriguezgonzalez.model.Lodging;
+import rodriguezgonzalez.model.Ubication;
 
 import javax.jms.*;
 import java.sql.SQLException;
@@ -13,20 +15,14 @@ public class TopicSuscriber implements Suscriber {
     private Connection connection;
     private ConnectionFactory factory;
     private Session session;
-    private SQLiteRecommendationStore storer;
     private DatalakeFileHandler handler;
 
-    public TopicSuscriber() throws StoreException {
-        try {
-            this.storer = new SQLiteRecommendationStore();
-            this.handler = new DatalakeFileHandler();
-        } catch (SQLException e) {
-            throw new StoreException(e.getMessage());
-        }
+    public TopicSuscriber() {
+        this.handler = new DatalakeFileHandler();
     }
 
     @Override
-    public void start(RecommendationFilter recommendationBuilder, EventProcessor processor) throws StoreException {
+    public void start(RecommendationBuilder recommendationBuilder, EventProcessor processor) throws StoreException {
         try {
             factory = new ActiveMQConnectionFactory(brokerUrl);
             connection = factory.createConnection();
@@ -35,21 +31,22 @@ public class TopicSuscriber implements Suscriber {
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Topic topic = session.createTopic(topicNames[0]);
             Topic topic1 = session.createTopic(topicNames[1]);
-            createWeatherConsumer(recommendationBuilder, topic, processor);
-            createHotelConsumer(recommendationBuilder, topic1, processor);
+            createWeatherConsumer(recommendationBuilder, topic);
+            createHotelConsumer(recommendationBuilder, topic1);
+            EventProcessorTimer timer = new EventProcessorTimer(recommendationBuilder, processor);
+            timer.startProcessingWithTimer();
         } catch (JMSException e) {
             throw new StoreException(e.getMessage());
         }
     }
 
-    private void createWeatherConsumer(RecommendationFilter recommendationBuilder, Topic topic, EventProcessor processor) throws JMSException {
+    private void createWeatherConsumer(RecommendationBuilder recommendationBuilder, Topic topic) throws JMSException {
         MessageConsumer consumer = session.createDurableSubscriber(topic, "recommendation-business-unit_" + topic.getTopicName());
         consumer.setMessageListener(message -> {
             try {
                 String text = ((TextMessage) message).getText();
                 if (text != null) {
                     recommendationBuilder.filter(text, topic.getTopicName());
-                    //storer.saveUbications(processor.getUbications());
                 } else {
                     handler.findLastWeatherFile();
                 }
@@ -59,14 +56,13 @@ public class TopicSuscriber implements Suscriber {
         });
     }
 
-    private void createHotelConsumer(RecommendationFilter recommendationBuilder, Topic topic, EventProcessor processor) throws JMSException {
+    private void createHotelConsumer(RecommendationBuilder recommendationBuilder, Topic topic) throws JMSException {
         MessageConsumer consumer = session.createDurableSubscriber(topic, "recommendation-business-unit_" + topic.getTopicName());
         consumer.setMessageListener(message -> {
             try {
                 String text = ((TextMessage) message).getText();
                 if (text != null) {
                     recommendationBuilder.filter(text, topic.getTopicName());
-                    //storer.saveLodgings(processor.getLodgings());
                 } else {
                     handler.findLastHotelFile();
                 }
@@ -75,5 +71,4 @@ public class TopicSuscriber implements Suscriber {
             }
         });
     }
-
 }
