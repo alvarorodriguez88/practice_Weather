@@ -1,22 +1,13 @@
 package rodriguezgonzalez.control;
 
 import rodriguezgonzalez.control.exceptions.StoreException;
-import rodriguezgonzalez.model.Lodging;
-import rodriguezgonzalez.model.Ubication;
-
-import java.sql.SQLException;
 
 public class BusinessLeaker implements RecommendationBuilder {
     private EventProcessor processor;
-    private SQLiteRecommendationStore storer;
 
-    public BusinessLeaker(EventProcessor processor) throws StoreException {
+
+    public BusinessLeaker(EventProcessor processor) {
         this.processor = processor;
-        try {
-            this.storer = new SQLiteRecommendationStore();
-        } catch (SQLException e) {
-            throw new StoreException(e.getMessage());
-        }
     }
 
     @Override
@@ -35,18 +26,4 @@ public class BusinessLeaker implements RecommendationBuilder {
             }
         }
     }
-    @Override
-    public void saveRecommendations(EventProcessor processor) throws StoreException {
-        System.out.println("Lista de Ubicaciones: ");
-        for (Ubication ubication : processor.getUbications()) {
-            System.out.println(ubication);
-        }
-        System.out.println("Lista de Alojamientos: ");
-        for (Lodging lodging : processor.getLodgings()) {
-            System.out.println(lodging);
-        }
-        storer.saveUbications(processor.getUbications());
-        storer.saveLodgings(processor.getLodgings());
-    }
-
 }

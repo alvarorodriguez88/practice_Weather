@@ -10,11 +10,11 @@ public class EventProcessorTimer {
     private final Object lock = new Object();
     private final long MAX_WAIT_TIME = 200000;
     private boolean processingFinished = false;
-    private final RecommendationBuilder recommendationBuilder;
+    private final RecommendationStore store;
     private EventProcessor processor;
 
-    public EventProcessorTimer(RecommendationBuilder recommendationBuilder, EventProcessor processor) {
-        this.recommendationBuilder = recommendationBuilder;
+    public EventProcessorTimer(RecommendationStore store, EventProcessor processor) {
+        this.store = store;
         this.processor = processor;
     }
 
@@ -43,12 +43,12 @@ public class EventProcessorTimer {
         }
 
         saveRecommendations();
-        timer.cancel(); // Cancelar el temporizador
+        timer.cancel();
     }
 
     private void saveRecommendations() throws StoreException {
-        // Realizar la acción después de que el procesamiento ha finalizado
-        recommendationBuilder.saveRecommendations(processor);
+        store.saveRecommendations(processor);
+        System.out.println("Base de datos actualizada");
     }
 }
 

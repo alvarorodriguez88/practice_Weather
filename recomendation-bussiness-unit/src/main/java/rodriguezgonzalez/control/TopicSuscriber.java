@@ -2,11 +2,8 @@ package rodriguezgonzalez.control;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import rodriguezgonzalez.control.exceptions.StoreException;
-import rodriguezgonzalez.model.Lodging;
-import rodriguezgonzalez.model.Ubication;
 
 import javax.jms.*;
-import java.sql.SQLException;
 
 public class TopicSuscriber implements Suscriber {
 
@@ -15,14 +12,14 @@ public class TopicSuscriber implements Suscriber {
     private Connection connection;
     private ConnectionFactory factory;
     private Session session;
-    private DatalakeFileHandler handler;
+    private EventProcessor processor;
 
-    public TopicSuscriber() {
-        this.handler = new DatalakeFileHandler();
+    public TopicSuscriber(EventProcessor processor) {
+        this.processor = processor;
     }
 
     @Override
-    public void start(RecommendationBuilder recommendationBuilder, EventProcessor processor) throws StoreException {
+    public void start(RecommendationBuilder recommendationBuilder, RecommendationStore store) throws StoreException {
         try {
             factory = new ActiveMQConnectionFactory(brokerUrl);
             connection = factory.createConnection();
@@ -33,7 +30,7 @@ public class TopicSuscriber implements Suscriber {
             Topic topic1 = session.createTopic(topicNames[1]);
             createWeatherConsumer(recommendationBuilder, topic);
             createHotelConsumer(recommendationBuilder, topic1);
-            EventProcessorTimer timer = new EventProcessorTimer(recommendationBuilder, processor);
+            EventProcessorTimer timer = new EventProcessorTimer(store, processor);
             timer.startProcessingWithTimer();
         } catch (JMSException e) {
             throw new StoreException(e.getMessage());
@@ -45,11 +42,7 @@ public class TopicSuscriber implements Suscriber {
         consumer.setMessageListener(message -> {
             try {
                 String text = ((TextMessage) message).getText();
-                if (text != null) {
-                    recommendationBuilder.filter(text, topic.getTopicName());
-                } else {
-                    handler.findLastWeatherFile();
-                }
+                recommendationBuilder.filter(text, topic.getTopicName());
             } catch (JMSException | StoreException e) {
                 System.err.println(e.getMessage());
             }
@@ -61,11 +54,7 @@ public class TopicSuscriber implements Suscriber {
         consumer.setMessageListener(message -> {
             try {
                 String text = ((TextMessage) message).getText();
-                if (text != null) {
-                    recommendationBuilder.filter(text, topic.getTopicName());
-                } else {
-                    handler.findLastHotelFile();
-                }
+                recommendationBuilder.filter(text, topic.getTopicName());
             } catch (JMSException | StoreException e) {
                 System.err.println(e.getMessage());
             }
