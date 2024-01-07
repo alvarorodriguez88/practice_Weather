@@ -5,7 +5,6 @@ import rodriguezgonzalez.model.Lodging;
 import rodriguezgonzalez.model.Ubication;
 
 import java.sql.*;
-import java.util.ArrayList;
 
 public class SQLiteRecommendationStore implements SQLStore {
     private Connection conn;
@@ -47,21 +46,18 @@ public class SQLiteRecommendationStore implements SQLStore {
         }
     }
 
-    private void insertClimate(ArrayList<Ubication> ubications) throws StoreException {
+    private void insertClimate(Ubication ubication) throws StoreException {
         try {
             conn.setAutoCommit(false);
             PreparedStatement preparedStatement = conn.prepareStatement(
                     "INSERT INTO Climate (Ubication, TEMP, POP, CLIMATE_CONDITION) " +
                             "VALUES (?, ?, ?, ?)"
             );
-
-            for (Ubication ubication : ubications) {
-                preparedStatement.setString(1, ubication.getAcronym());
-                preparedStatement.setDouble(2, ubication.getTemp());
-                preparedStatement.setDouble(3, ubication.getPop());
-                preparedStatement.setString(4, ubication.getWeatherCondition());
-                preparedStatement.addBatch();
-            }
+            preparedStatement.setString(1, ubication.getAcronym());
+            preparedStatement.setDouble(2, ubication.getTemp());
+            preparedStatement.setDouble(3, ubication.getPop());
+            preparedStatement.setString(4, ubication.getWeatherCondition());
+            preparedStatement.addBatch();
 
             preparedStatement.executeBatch();
             conn.commit();
@@ -76,42 +72,29 @@ public class SQLiteRecommendationStore implements SQLStore {
         }
     }
 
-    private void insertLodgings(ArrayList<Lodging> lodgings) throws StoreException {
+    private void insertLodgings(Lodging lodging) throws StoreException {
         try {
             conn.setAutoCommit(false);
             try (PreparedStatement preparedStatement = conn.prepareStatement(
                     "INSERT INTO Lodgings (Ubication, Hotel, WEBSITE, PRICE, CURRENCY, CHECKIN, CHECKOUT) " +
                             "VALUES (?, ?, ?, ?, ?, ?, ?)"
             )) {
-                for (Lodging lodging : lodgings) {
-                    if (!checkExistingLodging(lodging)) {
-                        preparedStatement.setString(1, lodging.getAcronym());
-                        preparedStatement.setString(2, lodging.getHotelName());
-                        preparedStatement.setString(3, lodging.getWebsite());
-                        preparedStatement.setDouble(4, lodging.getPrice());
-                        preparedStatement.setString(5, lodging.getCurrency());
-                        preparedStatement.setString(6, lodging.getCheckIn());
-                        preparedStatement.setString(7, lodging.getCheckOut());
-                        preparedStatement.addBatch();
-                    }
-                }
+                preparedStatement.setString(1, lodging.getAcronym());
+                preparedStatement.setString(2, lodging.getHotelName());
+                preparedStatement.setString(3, lodging.getWebsite());
+                preparedStatement.setDouble(4, lodging.getPrice());
+                preparedStatement.setString(5, lodging.getCurrency());
+                preparedStatement.setString(6, lodging.getCheckIn());
+                preparedStatement.setString(7, lodging.getCheckOut());
+                preparedStatement.addBatch();
                 preparedStatement.executeBatch();
                 conn.commit();
+            } catch (SQLException e) {
+                throw new StoreException(e.getMessage());
             }
         } catch (SQLException e) {
             throw new StoreException(e.getMessage());
         }
-    }
-    private int getUbicationID(String acronym) throws SQLException {
-        String query = "SELECT ID FROM Climate WHERE Ubication = ?";
-        try (PreparedStatement preparedStatement = conn.prepareStatement(query)) {
-            preparedStatement.setString(1, acronym);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt("ID");
-            }
-        }
-        throw new SQLException("Ubication ID not found for acronym: " + acronym);
     }
 
     private boolean checkExistingLodging(Lodging lodging) throws SQLException {
@@ -167,13 +150,13 @@ public class SQLiteRecommendationStore implements SQLStore {
     }
 
     @Override
-    public void saveUbications(ArrayList<Ubication> ubications) throws StoreException {
-        insertClimate(ubications);
+    public void saveUbications(Ubication ubication) throws StoreException {
+        insertClimate(ubication);
     }
 
     @Override
-    public void saveLodgings(ArrayList<Lodging> lodgings) throws StoreException {
-        insertLodgings(lodgings);
+    public void saveLodgings(Lodging lodging) throws StoreException {
+        insertLodgings(lodging);
     }
 
 }

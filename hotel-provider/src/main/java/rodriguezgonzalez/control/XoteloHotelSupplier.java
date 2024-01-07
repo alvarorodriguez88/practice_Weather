@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class XoteloHotelSupplier implements HotelSupplier {
-    //private final int DAYS_TO_FETCH = 5;
     private final int DAYS_TO_FETCH = 5;
 
     public XoteloHotelSupplier() {

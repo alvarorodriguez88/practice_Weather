@@ -20,8 +20,4 @@ public class Location implements Serializable {
     public double getLon() {
         return lon;
     }
-
-    public String getPlace() {
-        return place;
-    }
 }

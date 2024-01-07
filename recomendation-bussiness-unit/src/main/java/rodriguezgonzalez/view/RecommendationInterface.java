@@ -8,7 +8,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -23,22 +22,47 @@ public class RecommendationInterface extends JFrame implements ActionListener {
 
     public RecommendationInterface(Connection conn) {
         this.conn = conn;
+        init();
+    }
+    public void init(){
+        initialJFrame();
+        RecommendationInterface.entrancePanel entrancePanel = getEntrancePanel();
+        interfaceComponents();
+        addComponents(entrancePanel);
+        addPopulateDateComboBox();
+        JScrollPane scrollPane = getjScrollPane();
+        addToMainPanel(entrancePanel, scrollPane);
+    }
 
-        setTitle("CONSULT LODGINGS");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600); // Ajusta el tamaño inicial del JFrame
-        setLocationRelativeTo(null);
+    private void addToMainPanel(entrancePanel entrancePanel, JScrollPane scrollPane) {
+        entrancePanel.mainPanel().add(entrancePanel.inputPanel(), BorderLayout.NORTH);
+        entrancePanel.mainPanel().add(scrollPane, BorderLayout.CENTER);
+        add(entrancePanel.mainPanel());
+        setVisible(true);
+    }
 
-        // Panel principal
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BorderLayout());
+    private JScrollPane getjScrollPane() {
+        resultTable = new JTable();
+        JScrollPane scrollPane = new JScrollPane(resultTable);
+        return scrollPane;
+    }
 
-        // Panel de entrada
-        JPanel inputPanel = new JPanel();
-        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
-        inputPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    private void addPopulateDateComboBox() {
+        populateDateComboBox(checkInBox);
+        populateDateComboBox(checkOutBox);
+    }
 
-        // Componentes de la interfaz
+    private void addComponents(entrancePanel entrancePanel) {
+        entrancePanel.inputPanel().add(checkInLabel);
+        entrancePanel.inputPanel().add(checkInBox);
+        entrancePanel.inputPanel().add(checkOutLabel);
+        entrancePanel.inputPanel().add(checkOutBox);
+        entrancePanel.inputPanel().add(climateConditionLabel);
+        entrancePanel.inputPanel().add(climateConditionComboBox);
+        entrancePanel.inputPanel().add(enviarButton);
+    }
+
+    private void interfaceComponents() {
         checkInLabel = new JLabel("Check-In: ");
         checkInBox = createComboBox();
         checkOutLabel = new JLabel("Check-Out: ");
@@ -48,39 +72,34 @@ public class RecommendationInterface extends JFrame implements ActionListener {
         climateConditionComboBox = new JComboBox<>(climateOptions);
         enviarButton = new JButton("Consultar");
         enviarButton.addActionListener(this);
-
-        // Añadir componentes al panel de entrada
-        inputPanel.add(checkInLabel);
-        inputPanel.add(checkInBox);
-        inputPanel.add(checkOutLabel);
-        inputPanel.add(checkOutBox);
-        inputPanel.add(climateConditionLabel);
-        inputPanel.add(climateConditionComboBox);
-        inputPanel.add(enviarButton);
-
-        // Añadir opciones de fechas a los ComboBox
-        populateDateComboBox(checkInBox);
-        populateDateComboBox(checkOutBox);
-
-        // Panel de salida con tabla
-        resultTable = new JTable();
-        JScrollPane scrollPane = new JScrollPane(resultTable);
-
-        // Añadir panel de entrada y salida al panel principal
-        mainPanel.add(inputPanel, BorderLayout.NORTH);
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
-
-        // Añadir panel principal a la ventana
-        add(mainPanel);
-        setVisible(true);
     }
+
+    private static entrancePanel getEntrancePanel() {
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
+        inputPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        entrancePanel entrancePanel = new entrancePanel(mainPanel, inputPanel);
+        return entrancePanel;
+    }
+
+    private record entrancePanel(JPanel mainPanel, JPanel inputPanel) {
+    }
+
+    private void initialJFrame() {
+        setTitle("CONSULT LODGINGS");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(800, 600);
+        setLocationRelativeTo(null);
+    }
+
     private JComboBox<String> createComboBox() {
         return new JComboBox<>();
     }
     private void populateDateComboBox(JComboBox<String> comboBox) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate currentDate = LocalDate.now().plusDays(1);
-
         for (int i = 0; i < 6; i++) {
             comboBox.addItem(currentDate.format(formatter));
             currentDate = currentDate.plusDays(1);
@@ -101,40 +120,45 @@ public class RecommendationInterface extends JFrame implements ActionListener {
             }
             ArrayList<String> selectedHotels = queryManager.getUbicationsByClimate(climateCondition);
             ArrayList<String> stayInfo = queryManager.getHotelsInformation(selectedHotels, checkIn, checkOut);
-
-            // Convertir los datos a un modelo de tabla
-            DefaultTableModel tableModel = new DefaultTableModel();
-            tableModel.addColumn("Ubication");
-            tableModel.addColumn("Hotel Name");
-            tableModel.addColumn("Website");
-            tableModel.addColumn("Total price");
-
-            for (String info : stayInfo) {
-                String[] rowData = info.split(" -> ");
-                tableModel.addRow(rowData);
-            }
-
-            // Establecer el modelo de tabla en la JTable
-            resultTable.setModel(tableModel);
-
-            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-            centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-            resultTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-            resultTable.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
-
-            DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-            rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
-            resultTable.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
-
-            // Establecer tamaños fijos para cada columna
-            TableColumnModel columnModel = resultTable.getColumnModel();
-            columnModel.getColumn(0).setPreferredWidth(30); // Ancho fijo para la primera columna
-            columnModel.getColumn(1).setPreferredWidth(400); // Ancho fijo para la segunda columna
-            columnModel.getColumn(2).setPreferredWidth(100); // Ancho fijo para la tercera columna
-            columnModel.getColumn(3).setPreferredWidth(30); // Ancho fijo para la cuarta columna
-
-            // Repintar la tabla para aplicar los cambios
+            DefaultTableModel tableModel = convertToTableModel(stayInfo);
+            tableModelestablishment(tableModel);
+            establishColumns();
             resultTable.repaint();
         }
+    }
+
+    private void establishColumns() {
+        TableColumnModel columnModel = resultTable.getColumnModel();
+        columnModel.getColumn(0).setPreferredWidth(30); // Ancho fijo para la primera columna
+        columnModel.getColumn(1).setPreferredWidth(400); // Ancho fijo para la segunda columna
+        columnModel.getColumn(2).setPreferredWidth(100); // Ancho fijo para la tercera columna
+        columnModel.getColumn(3).setPreferredWidth(30); // Ancho fijo para la cuarta columna
+    }
+
+    private void tableModelestablishment(DefaultTableModel tableModel) {
+        resultTable.setModel(tableModel);
+
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        resultTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        resultTable.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
+        resultTable.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
+    }
+
+    private static DefaultTableModel convertToTableModel(ArrayList<String> stayInfo) {
+        DefaultTableModel tableModel = new DefaultTableModel();
+        tableModel.addColumn("Ubication");
+        tableModel.addColumn("Hotel Name");
+        tableModel.addColumn("Website");
+        tableModel.addColumn("Total price");
+
+        for (String info : stayInfo) {
+            String[] rowData = info.split(" -> ");
+            tableModel.addRow(rowData);
+        }
+        return tableModel;
     }
 }

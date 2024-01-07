@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public interface SQLStore {
     void createTables() throws StoreException;
-    void saveUbications(ArrayList<Ubication> ubications) throws StoreException;
-    void saveLodgings(ArrayList<Lodging> lodgings) throws StoreException;
+    void saveUbications(Ubication ubication) throws StoreException;
+    void saveLodgings(Lodging lodging) throws StoreException;
     void clearTables() throws StoreException;
 }

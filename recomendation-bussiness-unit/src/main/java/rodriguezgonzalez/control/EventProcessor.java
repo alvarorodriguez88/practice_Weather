@@ -7,16 +7,17 @@ import rodriguezgonzalez.model.Lodging;
 import rodriguezgonzalez.model.Ubication;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 public class EventProcessor {
     private ArrayList<Ubication> ubications;
     private ArrayList<Lodging> lodgings;
+    private RecommendationStorer storer;
 
-    public EventProcessor(String userCheckIn, String days, String weatherCondition) {
+    public EventProcessor() throws StoreException {
         this.ubications = new ArrayList<>();
         this.lodgings = new ArrayList<>();
+        this.storer = new RecommendationStorer();
+        storer.saveRecommendations();
     }
 
     public void processWeatherEvent(String json) throws StoreException {
@@ -29,7 +30,8 @@ public class EventProcessor {
         double pop = Double.parseDouble(jsonObject.get("pop").getAsString());
         Ubication ubication = new Ubication(acronym, temp, pop, weatherConditionString.replaceAll("\"", ""));
         ubications.add(ubication);
-        System.out.println("Evento de weather guardado.");
+        System.out.println("Event processed");
+        storer.saveUbicationRecommendation(ubication);
     }
 
     public void processHotelEvent(String json) throws StoreException {
@@ -45,26 +47,8 @@ public class EventProcessor {
         String hotelName = hotelInfo.get("name").toString().replaceAll("\"", "");
         Lodging lodging = new Lodging(acronym, checkIn, checkOut, hotelName, website, price, currency);
         lodgings.add(lodging);
-        System.out.println("Evento de hotel guardado.");
-    }
-
-    private void updateOrAddLodging(String acronym, String hotelName, String website, double price,
-                                    String checkIn, String checkOut, String currency) {
-        boolean lodgingExists = false;
-        for (Lodging existingLodging : lodgings) {
-            if (existingLodging.getAcronym().equals(acronym)
-                    && existingLodging.getHotelName().equals(hotelName)
-                    && existingLodging.getWebsite().equals(website)
-                    && existingLodging.getCheckIn().equals(checkIn)
-                    && existingLodging.getCheckOut().equals(checkOut)) {
-                lodgingExists = true;
-            }
-            if (!lodgingExists) {
-                Lodging lodging = new Lodging(acronym, checkIn, checkOut, hotelName, website, price, currency);
-                lodgings.add(lodging);
-            }
-        }
-
+        System.out.println("Event processed");
+        storer.saveLodgingRecommendation(lodging);
     }
 
     public ArrayList<Ubication> getUbications() {
