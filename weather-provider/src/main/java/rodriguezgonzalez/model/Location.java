@@ -5,12 +5,12 @@ import java.io.Serializable;
 public class Location implements Serializable {
     private double lat;
     private double lon;
-    private String isla;
+    private String place;
 
-    public Location(double lat, double lon, String isla) {
+    public Location(double lat, double lon, String place) {
         this.lat = lat;
         this.lon = lon;
-        this.isla = isla;
+        this.place = place;
     }
 
     public double getLat() {
@@ -19,9 +19,5 @@ public class Location implements Serializable {
 
     public double getLon() {
         return lon;
-    }
-
-    public String getIsla() {
-        return isla;
     }
 }
