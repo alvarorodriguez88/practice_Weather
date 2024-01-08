@@ -8,5 +8,6 @@ public class Main {
         BusinessLeaker leaker = new BusinessLeaker(processor);
         TopicSuscriber subscriber = new TopicSuscriber();
         subscriber.start(leaker);
+        rodriguezgonzalez.view.Main.main(args);
     }
 }

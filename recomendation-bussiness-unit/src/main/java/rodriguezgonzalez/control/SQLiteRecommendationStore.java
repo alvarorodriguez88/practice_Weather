@@ -118,12 +118,13 @@ public class SQLiteRecommendationStore implements SQLStore {
     public Connection connect(String dbPath) {
         Connection conn = null;
         try {
+            Class.forName("org.sqlite.JDBC");
             String url = "jdbc:sqlite:" + dbPath;
             conn = DriverManager.getConnection(url);
             System.out.println("Connected");
             return conn;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
         }
         return conn;
     }
