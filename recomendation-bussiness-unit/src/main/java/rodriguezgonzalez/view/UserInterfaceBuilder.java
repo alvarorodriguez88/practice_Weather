@@ -70,10 +70,10 @@ public class UserInterfaceBuilder extends JFrame implements ActionListener {
         checkInBox = createComboBox();
         checkOutLabel = new JLabel("Check-Out: ");
         checkOutBox = createComboBox();
-        climateConditionLabel = new JLabel("Condición Climática: ");
+        climateConditionLabel = new JLabel("Climate condition: ");
         String[] climateOptions = {" ", "Clouds", "Rain", "Clear", "Snow"};
         climateConditionComboBox = new JComboBox<>(climateOptions);
-        sendButton = new JButton("Consultar");
+        sendButton = new JButton("Consult");
         sendButton.addActionListener(this);
     }
 
