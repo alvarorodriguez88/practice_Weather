@@ -24,7 +24,7 @@ public class ProgramController {
                 }
             }
         };
-        long interval = 1000 * 60 * 10;
+        long interval = 1000 * 60 * 60 * 6;
         timer.schedule(task, 0, interval);
     }
 }
