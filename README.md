@@ -8,14 +8,14 @@
 
 ## Functionality Summary
 
-This program's functionality revolves around recommending hotels based on the weather conditions desired by the user. It suggests, among the scope of hotels across the 8 Canary Islands, those that align with the user's request and displays the different options along with their respective prices, allowing the user to make a choice.
+This program's functionality revolves around recommending hotels based on the weather conditions desired by the user. It suggests, among the scope of hotels across the 8 Canary Islands, those that align with the user's request and displays the different options along with their respective prices, allowing the user to make a choice. 
 
 The application will showcase a user interface where the user can input:
 - Check-in date
 - Check-out date
 - Weather condition
 
-Subsequently, the program will display a table listing hotels that have (at least on 1 of their 5 forecasted days) the specific weather condition desired by the user. This table will arrange hotels in ascending order of price.
+Subsequently, the program will display a table listing hotels that have (at least on 1 of their 5 forecasted days) the specific weather condition desired by the user. This table will arrange hotels in ascending order of price. The initial check-in will be the next day we are checking the application, and the check-out will be 3 days later(maximum 4 days of estance), because of the prediction weather.
 
 >**NOTE**: The interface won’t display any content in the table if there's no available data or if the check-in and check-out dates are entered incorrectly.
 
