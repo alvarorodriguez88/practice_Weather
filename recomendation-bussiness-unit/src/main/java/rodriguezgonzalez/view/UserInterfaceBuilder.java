@@ -1,5 +1,7 @@
 package rodriguezgonzalez.view;
 
+import rodriguezgonzalez.control.SQLQueryManager;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -13,20 +15,21 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-public class RecommendationInterface extends JFrame implements ActionListener {
+public class UserInterfaceBuilder extends JFrame implements ActionListener {
     private JLabel checkInLabel, checkOutLabel, climateConditionLabel;
-    private JComboBox<String> checkInBox, checkOutBox,  climateConditionComboBox;
-    private JButton enviarButton;
+    private JComboBox<String> checkInBox, checkOutBox, climateConditionComboBox;
+    private JButton sendButton;
     private static Connection conn;
     private JTable resultTable;
 
-    public RecommendationInterface(Connection conn) {
-        this.conn = conn;
+    public UserInterfaceBuilder(Connection conn) {
+        UserInterfaceBuilder.conn = conn;
         init();
     }
-    public void init(){
+
+    public void init() {
         initialJFrame();
-        RecommendationInterface.entrancePanel entrancePanel = getEntrancePanel();
+        UserInterfaceBuilder.entrancePanel entrancePanel = getEntrancePanel();
         interfaceComponents();
         addComponents(entrancePanel);
         addPopulateDateComboBox();
@@ -59,7 +62,7 @@ public class RecommendationInterface extends JFrame implements ActionListener {
         entrancePanel.inputPanel().add(checkOutBox);
         entrancePanel.inputPanel().add(climateConditionLabel);
         entrancePanel.inputPanel().add(climateConditionComboBox);
-        entrancePanel.inputPanel().add(enviarButton);
+        entrancePanel.inputPanel().add(sendButton);
     }
 
     private void interfaceComponents() {
@@ -70,8 +73,8 @@ public class RecommendationInterface extends JFrame implements ActionListener {
         climateConditionLabel = new JLabel("Condición Climática: ");
         String[] climateOptions = {" ", "Clouds", "Rain", "Clear", "Snow"};
         climateConditionComboBox = new JComboBox<>(climateOptions);
-        enviarButton = new JButton("Consultar");
-        enviarButton.addActionListener(this);
+        sendButton = new JButton("Consultar");
+        sendButton.addActionListener(this);
     }
 
     private static entrancePanel getEntrancePanel() {
@@ -80,8 +83,7 @@ public class RecommendationInterface extends JFrame implements ActionListener {
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
         inputPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        entrancePanel entrancePanel = new entrancePanel(mainPanel, inputPanel);
-        return entrancePanel;
+        return new entrancePanel(mainPanel, inputPanel);
     }
 
     private record entrancePanel(JPanel mainPanel, JPanel inputPanel) {
@@ -97,6 +99,7 @@ public class RecommendationInterface extends JFrame implements ActionListener {
     private JComboBox<String> createComboBox() {
         return new JComboBox<>();
     }
+
     private void populateDateComboBox(JComboBox<String> comboBox) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate currentDate = LocalDate.now().plusDays(1);
@@ -105,13 +108,12 @@ public class RecommendationInterface extends JFrame implements ActionListener {
             currentDate = currentDate.plusDays(1);
         }
     }
+
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == enviarButton) {
+        if (e.getSource() == sendButton) {
             String checkIn = checkInBox.getSelectedItem().toString();
             String checkOut = checkOutBox.getSelectedItem().toString();
             String climateCondition = climateConditionComboBox.getSelectedItem().toString();
-
-            // Llamada a métodos para realizar consultas SQL y obtener resultados
             SQLQueryManager queryManager = null;
             try {
                 queryManager = new SQLQueryManager(conn);
@@ -129,10 +131,10 @@ public class RecommendationInterface extends JFrame implements ActionListener {
 
     private void establishColumns() {
         TableColumnModel columnModel = resultTable.getColumnModel();
-        columnModel.getColumn(0).setPreferredWidth(30); // Ancho fijo para la primera columna
-        columnModel.getColumn(1).setPreferredWidth(400); // Ancho fijo para la segunda columna
-        columnModel.getColumn(2).setPreferredWidth(100); // Ancho fijo para la tercera columna
-        columnModel.getColumn(3).setPreferredWidth(30); // Ancho fijo para la cuarta columna
+        columnModel.getColumn(0).setPreferredWidth(30);
+        columnModel.getColumn(1).setPreferredWidth(400);
+        columnModel.getColumn(2).setPreferredWidth(100);
+        columnModel.getColumn(3).setPreferredWidth(30);
     }
 
     private void tableModelestablishment(DefaultTableModel tableModel) {
@@ -154,7 +156,6 @@ public class RecommendationInterface extends JFrame implements ActionListener {
         tableModel.addColumn("Hotel Name");
         tableModel.addColumn("Website");
         tableModel.addColumn("Total price");
-
         for (String info : stayInfo) {
             String[] rowData = info.split(" -> ");
             tableModel.addRow(rowData);

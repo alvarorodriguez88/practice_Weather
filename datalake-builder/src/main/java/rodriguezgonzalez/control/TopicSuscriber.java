@@ -7,8 +7,8 @@ import javax.jms.*;
 
 public class TopicSuscriber implements Suscriber {
 
-    private String brokerUrl = "tcp://localhost:61616";
-    private String[] topicNames = {"prediction.Weather", "information.Hotel"};
+    private final String brokerUrl = "tcp://localhost:61616";
+    private final String[] topicNames = {"prediction.Weather", "information.Hotel"};
     private Connection connection;
     private ConnectionFactory factory;
     private Session session;

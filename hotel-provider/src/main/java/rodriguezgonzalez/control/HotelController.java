@@ -12,12 +12,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class HotelController {
-    private String path;
-    private XoteloHotelSupplier xoteloHotelSupplier;
-    private ArrayList<HotelInfo> hotelsInfo;
-    private JMSHotelStore jmsHotelStore;
+    private final String path;
+    private final XoteloHotelSupplier xoteloHotelSupplier;
+    private final ArrayList<HotelInfo> hotelsInfo;
+    private final JMSHotelStore jmsHotelStore;
 
-    public HotelController(){
+    public HotelController() {
         this.path = "./chozos3.txt";
         this.xoteloHotelSupplier = new XoteloHotelSupplier();
         this.jmsHotelStore = new JMSHotelStore();
@@ -44,16 +44,17 @@ public class HotelController {
             throw new StoreException(e.getMessage());
         }
     }
-    public void execute() throws StoreException{
+
+    public void execute() throws StoreException {
         try {
             readHotelInfo();
             jmsHotelStore.connect();
-            for (HotelInfo hotelInfo : hotelsInfo){
+            for (HotelInfo hotelInfo : hotelsInfo) {
                 ArrayList<Hotel> hotels = xoteloHotelSupplier.getHotel(hotelInfo);
                 jmsHotelStore.save(hotels);
             }
             jmsHotelStore.getConnection().close();
-        } catch (JMSException e){
+        } catch (JMSException e) {
             throw new StoreException(e.getMessage());
         }
     }

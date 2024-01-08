@@ -42,10 +42,7 @@ public class XoteloHotelSupplier implements HotelSupplier {
             JsonObject jsonObject = parser.parse(json).getAsJsonObject();
             JsonObject resultObject = jsonObject.get("result").getAsJsonObject();
             JsonArray ratesArray = resultObject.getAsJsonArray("rates");
-            if (!ratesArray.isEmpty()){
-                return true;
-            }
-            return false;
+            return !ratesArray.isEmpty();
         } catch (IOException e) {
             throw new StoreException(e.getMessage());
         }
@@ -93,6 +90,7 @@ public class XoteloHotelSupplier implements HotelSupplier {
             throw new StoreException(e.getMessage());
         }
     }
+
     private List<LocalDate> getNextNDays(LocalDate startDate, int days) {
         List<LocalDate> dates = new ArrayList<>();
         for (int i = 0; i < days; i++) {

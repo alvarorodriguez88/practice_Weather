@@ -3,7 +3,7 @@ package rodriguezgonzalez.control;
 import rodriguezgonzalez.control.exceptions.StoreException;
 
 public class BusinessLeaker implements RecommendationBuilder {
-    private EventProcessor processor;
+    private final EventProcessor processor;
 
 
     public BusinessLeaker(EventProcessor processor) {

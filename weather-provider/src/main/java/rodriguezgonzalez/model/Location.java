@@ -3,9 +3,9 @@ package rodriguezgonzalez.model;
 import java.io.Serializable;
 
 public class Location implements Serializable {
-    private double lat;
-    private double lon;
-    private String place;
+    private final double lat;
+    private final double lon;
+    private final String place;
 
     public Location(double lat, double lon, String place) {
         this.lat = lat;

@@ -1,17 +1,17 @@
 package rodriguezgonzalez.view;
 
+import javax.swing.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import javax.swing.SwingUtilities;
 
-public class Main {
-    public static void main(String[] args) {
+public class Connector {
+    public void connection() {
         String dbPath = "./Datamart.db";
         try {
             Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
             SwingUtilities.invokeLater(() -> {
-                new RecommendationInterface(conn);
+                new UserInterfaceBuilder(conn);
             });
         } catch (SQLException e) {
             e.printStackTrace();

@@ -6,8 +6,8 @@ import rodriguezgonzalez.model.Ubication;
 
 import java.sql.SQLException;
 
-public class RecommendationStorer implements RecommendationStore{
-    private SQLiteRecommendationStore storer;
+public class RecommendationStorer implements RecommendationStore {
+    private final SQLiteRecommendationStore storer;
 
     public RecommendationStorer() throws StoreException {
         try {
@@ -20,7 +20,7 @@ public class RecommendationStorer implements RecommendationStore{
     @Override
     public void saveRecommendations() throws StoreException {
         storer.createTables();
-        System.out.println("---Tables Iniciated---");
+        System.out.println("---Tables Initiated---");
         storer.clearTables();
     }
 

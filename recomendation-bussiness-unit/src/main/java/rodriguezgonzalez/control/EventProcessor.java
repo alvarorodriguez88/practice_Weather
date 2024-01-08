@@ -6,16 +6,10 @@ import rodriguezgonzalez.control.exceptions.StoreException;
 import rodriguezgonzalez.model.Lodging;
 import rodriguezgonzalez.model.Ubication;
 
-import java.util.ArrayList;
-
 public class EventProcessor {
-    private ArrayList<Ubication> ubications;
-    private ArrayList<Lodging> lodgings;
-    private RecommendationStorer storer;
+    private final RecommendationStorer storer;
 
     public EventProcessor() throws StoreException {
-        this.ubications = new ArrayList<>();
-        this.lodgings = new ArrayList<>();
         this.storer = new RecommendationStorer();
         storer.saveRecommendations();
     }
@@ -29,7 +23,6 @@ public class EventProcessor {
         double temp = Double.parseDouble(jsonObject.get("temp").getAsString());
         double pop = Double.parseDouble(jsonObject.get("pop").getAsString());
         Ubication ubication = new Ubication(acronym, temp, pop, weatherConditionString.replaceAll("\"", ""));
-        ubications.add(ubication);
         System.out.println("Event processed");
         storer.saveUbicationRecommendation(ubication);
     }
@@ -46,16 +39,7 @@ public class EventProcessor {
         String acronym = hotelInfo.get("acronym").toString().replaceAll("\"", "");
         String hotelName = hotelInfo.get("name").toString().replaceAll("\"", "");
         Lodging lodging = new Lodging(acronym, checkIn, checkOut, hotelName, website, price, currency);
-        lodgings.add(lodging);
         System.out.println("Event processed");
         storer.saveLodgingRecommendation(lodging);
-    }
-
-    public ArrayList<Ubication> getUbications() {
-        return ubications;
-    }
-
-    public ArrayList<Lodging> getLodgings() {
-        return lodgings;
     }
 }
