@@ -52,6 +52,9 @@ Subsequently, the program will display a table listing hotels that have (at leas
 9. Finally, the data mart will be in the same directory as the recommendation-business-unit module, continuously updating until no more events are sent.
 
 ---
+## Class Diagram
+
+---
 
 ## Program Logic
 
