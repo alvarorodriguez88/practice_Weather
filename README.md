@@ -52,7 +52,18 @@ Subsequently, the program will display a table listing hotels that have (at leas
 9. Finally, the data mart will be in the same directory as the recommendation-business-unit module, continuously updating until no more events are sent.
 
 ---
-## Class Diagram
+## Class Diagrams
+##### Datalake Builder
+![Captura de pantalla 2024-01-08 150402](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/4ec3ccdb-9258-4a76-a5aa-e2ecbb9ed538)
+
+##### Hotel Provider
+![Captura de pantalla 2024-01-08 162922](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/5c933c19-bf89-440e-9eff-0add506a783c)
+
+#### Recommendation-Business-Unit
+![Captura de pantalla 2024-01-08 201759](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/6a3473ef-b761-42e5-a51d-5d94d012e2e1)
+
+#### Weather-Provider
+![Captura de pantalla 2024-01-08 204247](https://github.com/alvarorodriguez88/practice_Weather/assets/145196321/93379fdd-0ee0-4467-8172-cf1c8ec6a0b5)
 
 ---
 
