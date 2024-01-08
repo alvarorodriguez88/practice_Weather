@@ -45,12 +45,11 @@ public class TopicSuscriber implements Suscriber {
             try {
                 Instant now = Instant.now();
                 long diffInMinutes = Duration.between(ref.latestUpdate, now).toMinutes();
-                System.out.println(diffInMinutes);
-                if (diffInMinutes > 8) {
+                if (diffInMinutes > 60 ) {
                     ref.latestUpdate = now;
                     RecommendationStorer storer = new RecommendationStorer();
                     storer.saveRecommendations();
-                    System.out.println("Se reinició la db");
+                    System.out.println("DataBase Reinitialized");
                     String text = ((TextMessage) message).getText();
                     recommendationBuilder.filter(text, topic.getTopicName());
                 } else {

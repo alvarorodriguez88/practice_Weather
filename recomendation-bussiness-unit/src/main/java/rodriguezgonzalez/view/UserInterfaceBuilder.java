@@ -103,7 +103,7 @@ public class UserInterfaceBuilder extends JFrame implements ActionListener {
     private void populateDateComboBox(JComboBox<String> comboBox) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate currentDate = LocalDate.now().plusDays(1);
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 4; i++) {
             comboBox.addItem(currentDate.format(formatter));
             currentDate = currentDate.plusDays(1);
         }
