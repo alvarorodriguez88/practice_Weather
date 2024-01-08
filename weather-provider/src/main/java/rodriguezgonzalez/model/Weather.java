@@ -3,16 +3,16 @@ package rodriguezgonzalez.model;
 import java.time.Instant;
 
 public class Weather {
-    private Instant ts;
-    private Instant predictionTime;
-    private String ss;
-    private double pop;
-    private double windSpeed;
-    private double temp;
-    private int humidity;
-    private int clouds;
-    private Location location;
-    private String weatherCondition;
+    private final Instant ts;
+    private final Instant predictionTime;
+    private final String ss;
+    private final double pop;
+    private final double windSpeed;
+    private final double temp;
+    private final int humidity;
+    private final int clouds;
+    private final Location location;
+    private final String weatherCondition;
 
     public Weather(Instant predictionTime, double pop, double windSpeed, double temp, int humidity, int clouds, Location location, String weatherCondition) {
         this.ts = Instant.now();

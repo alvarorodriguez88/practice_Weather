@@ -1,5 +1,7 @@
-package rodriguezgonzalez.control;
+package rodriguezgonzalez;
 
+import rodriguezgonzalez.control.FileEventStoreBuilder;
+import rodriguezgonzalez.control.TopicSuscriber;
 import rodriguezgonzalez.control.exceptions.StoreException;
 
 public class Main {

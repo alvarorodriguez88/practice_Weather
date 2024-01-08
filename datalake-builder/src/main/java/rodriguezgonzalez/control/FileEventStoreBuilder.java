@@ -2,6 +2,7 @@ package rodriguezgonzalez.control;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -12,7 +13,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 public class FileEventStoreBuilder implements EventStoreBuilder {
-    private String basePath;
+    private final String basePath;
 
     public FileEventStoreBuilder(String basePath) {
         this.basePath = basePath;

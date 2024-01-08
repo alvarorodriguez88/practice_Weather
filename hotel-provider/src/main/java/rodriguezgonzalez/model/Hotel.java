@@ -22,28 +22,4 @@ public class Hotel {
         this.rate = rate;
         this.hotelInfo = hotelInfo;
     }
-
-    public String getWebsite() {
-        return website;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public String getCheckIn() {
-        return checkIn;
-    }
-
-    public String getCheckOut() {
-        return checkOut;
-    }
-
-    public int getRate() {
-        return rate;
-    }
-
-    public HotelInfo getHotelInfo() {
-        return hotelInfo;
-    }
 }

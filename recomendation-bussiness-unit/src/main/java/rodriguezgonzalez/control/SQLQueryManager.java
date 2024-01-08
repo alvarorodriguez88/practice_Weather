@@ -1,4 +1,4 @@
-package rodriguezgonzalez.view;
+package rodriguezgonzalez.control;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,8 +9,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 public class SQLQueryManager {
-    private Connection conn;
-    private ArrayList<String> selectedUbications;
+    private final Connection conn;
+    private final ArrayList<String> selectedUbications;
 
     public SQLQueryManager(Connection conn) throws SQLException {
         this.conn = conn;

@@ -1,13 +1,13 @@
 package rodriguezgonzalez.model;
 
 public class Lodging {
-    private String acronym;
-    private String checkIn;
-    private String checkOut;
-    private String hotelName;
-    private String website;
+    private final String acronym;
+    private final String checkIn;
+    private final String checkOut;
+    private final String hotelName;
+    private final String website;
     private double price;
-    private String currency;
+    private final String currency;
 
     public Lodging(String acronym, String checkIn, String checkOut, String hotelName, String website, double price, String currency) {
         this.acronym = acronym;
@@ -41,10 +41,6 @@ public class Lodging {
 
     public double getPrice() {
         return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
     }
 
     public String getCurrency() {

@@ -7,8 +7,8 @@ import rodriguezgonzalez.model.Ubication;
 import java.sql.*;
 
 public class SQLiteRecommendationStore implements SQLStore {
-    private Connection conn;
-    private Statement statement;
+    private final Connection conn;
+    private final Statement statement;
 
     public SQLiteRecommendationStore() throws SQLException {
         this.conn = connect("./Datamart.db");
@@ -97,33 +97,16 @@ public class SQLiteRecommendationStore implements SQLStore {
         }
     }
 
-    private boolean checkExistingLodging(Lodging lodging) throws SQLException {
-        String query = "SELECT COUNT(*) AS count FROM Lodgings " +
-                "WHERE Hotel = ? AND WEBSITE = ? AND CHECKIN = ? AND CHECKOUT = ?";
-        PreparedStatement preparedStatement = conn.prepareStatement(query);
-        preparedStatement.setString(1, lodging.getHotelName());
-        preparedStatement.setString(2, lodging.getWebsite());
-        preparedStatement.setString(3, lodging.getCheckIn());
-        preparedStatement.setString(4, lodging.getCheckOut());
-        ResultSet resultSet = preparedStatement.executeQuery();
-
-        if (resultSet.next()) {
-            int count = resultSet.getInt("count");
-            return count > 0;
-        }
-
-        return false;
-    }
-
     public Connection connect(String dbPath) {
         Connection conn = null;
         try {
+            Class.forName("org.sqlite.JDBC");
             String url = "jdbc:sqlite:" + dbPath;
             conn = DriverManager.getConnection(url);
             System.out.println("Connected");
             return conn;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
         }
         return conn;
     }

@@ -1,10 +1,10 @@
 package rodriguezgonzalez.model;
 
 public class Ubication {
-    private String acronym;
-    private double temp;
-    private double pop;
-    private String weatherCondition;
+    private final String acronym;
+    private final double temp;
+    private final double pop;
+    private final String weatherCondition;
 
     public Ubication(String acronym, double temp, double pop, String weatherCondition) {
         this.acronym = acronym;

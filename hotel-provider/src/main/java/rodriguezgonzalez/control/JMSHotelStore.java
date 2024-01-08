@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
 import java.time.Instant;
 import java.util.ArrayList;
 
-public class JMSHotelStore implements HotelStore{
+public class JMSHotelStore implements HotelStore {
     private final String brokerUrl = "tcp://localhost:61616";
     private final String subject = "information.Hotel";
     private ConnectionFactory connectionFactory;
@@ -37,28 +37,32 @@ public class JMSHotelStore implements HotelStore{
             throw new StoreException(e.getMessage());
         }
     }
+
     public Connection getConnection() {
         return connection;
     }
+
     @Override
     public void save(ArrayList<Hotel> hotels) throws StoreException {
         try {
-            for (Hotel hotel : hotels){
+            for (Hotel hotel : hotels) {
                 String json = hotelToJson(hotel);
                 TextMessage text = session.createTextMessage(json);
                 producer.send(text);
                 System.out.println("Message sent...");
             }
-        } catch (JMSException e){
+        } catch (JMSException e) {
             throw new StoreException(e.getMessage());
         }
     }
+
     private String hotelToJson(Hotel hotel) {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Instant.class, new InstantAdapter())
                 .create();
         return gson.toJson(hotel);
     }
+
     private static class InstantAdapter implements JsonSerializer<Instant> {
 
         @Override
