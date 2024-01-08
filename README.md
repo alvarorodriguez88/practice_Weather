@@ -72,7 +72,7 @@ Subsequently, the program will display a table listing hotels that have (at leas
 The program comprises active modules responsible for communicating with 2 APIs to retrieve data and send it to the broker.
 
 - **Weather-provider:** Communicates with the OpenWeatherMap API, sending events every 6 hours with the forecast for the next 5 days at 12 PM.
-- **Hotel-provider:** Manages communication with the Xotelo API, sending events regarding hotels with their nightly prices every 3 hours. Its shorter periodicity is due to its variable availability, as it depends on various factors.
+- **Hotel-provider:** Manages communication with the Xotelo API, sending events regarding hotels with their nightly prices every 6 hours.
 
 On the other hand, passive modules process events from both topics for exploitation.
 
